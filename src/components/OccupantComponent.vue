@@ -1,12 +1,7 @@
 <template>
+  
   <div>
-    <v-text-field
-      v-model="search"
-      label="Search"
-      solo
-      hide-details
-      class="mb-4"
-    >
+    <v-text-field v-model="search" label="Search" solo hide-details class="mb-4">
       <v-btn slot="append" icon @click="searchOccupants">
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
@@ -21,11 +16,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="occupant in filteredOccupants" :key="occupant.id">
+          <tr v-for="occupant in filteredOccupants" :key="occupant.Occupant_ID">
             <td>{{ occupant.Firstname }} {{ occupant.Lastname }}</td>
             <td class="text-center">{{ occupant.Phonenumber }}</td>
             <td class="text-center">
-              <v-btn small color="primary" @click="viewOccupant(occupant)">
+              <v-btn small color="primary" @click="viewOccupant(occupant.Occupant_ID)">
                 <v-icon small>mdi-eye</v-icon>
                 View
               </v-btn>
@@ -37,15 +32,6 @@
   </div>
 </template>
 
-<style>
- .v-simple-table {
-    border: 1px solid #ddd;
-  }
- .v-simple-table th,.v-simple-table td {
-    border: 1px solid #ddd;
-  }
-</style>
-
 <script>
 import axios from 'axios';
 
@@ -55,14 +41,6 @@ export default {
     return {
       search: '',
       occupants: [],
-      headers: [
-        { text: 'Name', value: 'name' },
-        { text: 'Phone Number', value: 'phonenumber' },
-        { text: 'Actions', value: 'actions', sortable: false },
-      ],
-      pagination: {
-        rowsPerPage: 10
-      }
     };
   },
   mounted() {
@@ -83,32 +61,41 @@ export default {
   methods: {
     fetchOccupants() {
       axios
-      .get('http://localhost:8080/parking_occupant/api/FetchOccupants.php')
-      .then(response => {
+        .get('http://localhost:8080/parking_occupant/api/FetchOccupants.php')
+        .then(response => {
           if (response.data.success) {
             this.occupants = response.data.occupants;
           } else {
             console.error('Error fetching occupants:', response.data.error);
           }
         })
-      .catch(error => {
+        .catch(error => {
           console.error('Error fetching occupants:', error);
         });
     },
     searchOccupants() {
       // No need to implement anything here, the filteredOccupants computed property will take care of filtering the occupants array
     },
-    viewOccupant(item) {
-      // Implement view occupant logic here
-      console.log(`Viewing occupant ${item.Firstname} ${item.Lastname}`);
-      // Example: Navigate to a detailed view component
-      // this.$router.push(`/occupant/${item.id}`);
-    },
-  },
+    viewOccupant(id) {
+      // const occupant = this.filteredOccupants.find(occupant => occupant.Occupant_ID === id);
+      // if (occupant) {
+      //   console.log('Occupant ID:', occupant.Occupant_ID);
+      //   this.$router.push({ name: 'view-action-occupant', params: { id: occupant.Occupant_ID } });
+      // } else {
+      //   console.error('Occupant not found:', id);
+      // }
+      this.$router.push({ name: 'view-action-occupant', params: { id } });
+    }
+  }
 };
 </script>
 
 <style scoped>
-@import '~@fortawesome/fontawesome-free/css/all.css';
-@import '~material-design-icons-iconfont/dist/material-design-icons.css';
+.v-simple-table {
+  border: 1px solid #ddd;
+}
+.v-simple-table th,
+.v-simple-table td {
+  border: 1px solid #ddd;
+}
 </style>

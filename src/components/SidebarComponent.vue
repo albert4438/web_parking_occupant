@@ -76,27 +76,28 @@ export default {
     }
   },
   methods: {
-    handleItemClick(index, item) {
-      if (item.text === 'LOGOUT') {
-        this.logout();
-      } else {
-        this.navigateTo(index, item.text, item.route);
-      }
-    },
-    navigateTo(index, title, route) {
-      this.selectedItem = index; // Update selectedItem when navigating
-      this.$emit('update-title', title);
-      if (this.$route.path !== route) {
-        this.$router.push(route);
-      }
-    },
-    logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      localStorage.removeItem('jobTitle');
-      this.$router.push('/');
+  handleItemClick(index, item) {
+    if (item.text === 'LOGOUT') {
+      this.logout();
+    } else {
+      this.navigateTo(index, item.text, item.route);
     }
+  },
+  navigateTo(index, title, route) {
+    this.selectedItem = index; // Update selectedItem when navigating
+    this.$emit('update-title', title);
+    if (this.$route.path !== route) {
+      this.$router.push(route);
+    }
+  },
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('jobTitle');
+    this.$router.push('/');
   }
+}
+
 };
 </script>
 

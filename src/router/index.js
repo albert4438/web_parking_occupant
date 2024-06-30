@@ -7,13 +7,9 @@ import RegistrationComponent from '../components/RegistrationComponent.vue';
 import ParkingLogComponent from '../components/ParkingLogComponent.vue';
 import SettingsComponent from '../components/SettingsComponent.vue';
 import RoleRegisterComponent from '@/components/RoleRegisterComponent.vue';
-// eslint-disable-next-line no-unused-vars
-// import VueGoogleCharts from 'vue-google-charts';
+import ViewActionOccupantComponent from '@/components/ViewActionOccupantComponent.vue';
 
 Vue.use(VueRouter);
-
-// const cors = require("cors");
-// app.use(cors());
 
 const routes = [
   {
@@ -34,6 +30,14 @@ const routes = [
         name: 'occupant',
         component: OccupantComponent,
         meta: { requiresAuth: true }, // Require authentication to access
+      },
+      {
+        path: 'occupant/view-action-occupant/:id',
+        name: 'view-action-occupant',
+        component: ViewActionOccupantComponent,
+        //component: () => import('../components/ViewActionOccupantComponent.vue'),
+        meta: { requiresAuth: true }, // Require authentication to access
+        props: route => ({ occupantId: Number(route.params.id) })
       },
       {
         path: 'registration',
