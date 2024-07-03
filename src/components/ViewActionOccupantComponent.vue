@@ -3,7 +3,7 @@
     <v-btn color="primary" @click="$router.push({ name: 'occupant' })" style="margin-bottom: 14px;">Back</v-btn>
 
     <v-form>
-      <v-container grid-list-md style="border: 1px solid #ccc; border-radius: 10px; padding: 10px;">
+      <v-container grid-  -md style="border: 1px solid #ccc; border-radius: 10px; padding: 10px;">
         <v-layout wrap>
           <v-flex xs12 md6>
   <v-card flat>
@@ -187,7 +187,7 @@
                     <td>{{ item.Vehicle_model }}</td>
                     <td>{{ item.Vehicle_brand }}</td>
                     <td>
-                      <v-btn small color="primary" @click="viewQrCode(item)">View QR Code</v-btn>
+                      <v-btn small color="primary" class="ml-2" @click="showVehicleId(item)">QR Code</v-btn>
                       <v-btn small color="warning" class="ml-2" @click="editVehicle(item)">Edit</v-btn>
                     </td>
                   </tr>
@@ -195,6 +195,27 @@
                 </v-data-table>
 
                 <v-btn color="primary" @click="showAddVehicleForm = true">Add Vehicle</v-btn>
+
+
+                        <!-- Modal to display vehicle ID -->
+                        <v-dialog v-model="showVehicleIdModal" max-width="300px">
+                        <v-card>
+                          <v-card-title>Vehicle ID</v-card-title>
+                          <!-- <v-tit>No QR Code yet! Please click the button to generate</v-tit> -->
+                           <v-car>
+                            <p>No QR Code yet! Please click the button to generate</p>
+                           </v-car>
+                          <!-- <v-card-text>
+                            <p>Vehicle ID: {{ selectedVehicleId }}</p>
+                          </v-card-text> -->
+                          <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="primary" @click="showVehicleIdModal = false">Generate</v-btn>
+                            <v-btn color="primary" @click="showVehicleIdModal = false">Close</v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </v-dialog>
+
               </v-card-text>
             </v-card>
           </v-flex>
@@ -265,11 +286,15 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+
   </div>
+  
 </template>
 
 <script>
 import axios from 'axios';
+// import qrcode from 'qrcode';
 
 export default {
   props: {
@@ -285,8 +310,11 @@ export default {
   },
   data() {
     return {
+      showVehicleIdModal: false,
+      selectedVehicleId: null,
       editMode: false,
       showAddVehicleForm: false,
+      showVehicleDetails: false,
       occupantName: '',
       personnelRole: '',
       personnelUsername: '',
@@ -389,55 +417,63 @@ export default {
         });
     },
 
-    addVehicle() {
-  const vehicleData = {
-    occupantId: this.occupantId,
-    vehicleType: this.vehicleType,
-    vehicleColor: this.vehicleColor,
-    vehiclePlateNumber: this.vehiclePlateNumber,
-    vehicleModel: this.vehicleModel,
-    vehicleBrand: this.vehicleBrand
-  };
+     addVehicle() {
+      const vehicleData = {
+        occupantId: this.occupantId,
+        vehicleType: this.vehicleType,
+        vehicleColor: this.vehicleColor,
+        vehiclePlateNumber: this.vehiclePlateNumber,
+        vehicleModel: this.vehicleModel,
+        vehicleBrand: this.vehicleBrand
+      };
 
-  axios.post('http://localhost:8080/parking_occupant/api/AddVehicle.php', vehicleData)
-    .then(response => {
-      if (response.data.success) {
-        console.log('Vehicle added successfully!');
-        // Add vehicle to occupantVehicles array
-        this.occupantVehicles.push({
-          vehicle_type: this.vehicleType,
-          vehicle_color: this.vehicleColor,
-          vehicle_platenumber: this.vehiclePlateNumber,
-          vehicle_model: this.vehicleModel,
-          vehicle_brand: this.vehicleBrand
-        });
-        // Clear form fields
-        this.vehicleType = '';
-        this.vehicleColor = '';
-        this.vehiclePlateNumber = '';
-        this.vehicleModel = '';
-        this.vehicleBrand = '';
-        // Close the dialog
-        this.showAddVehicleForm = false;
-      } else {
-        console.error('Error adding vehicle:', response.data);
-        // Handle error response as needed
-      }
-    })
-    .catch(error => {
-      console.error('Error adding vehicle:', error);
-      // Handle network error or other exceptions
-      if (error.response && error.response.data) {
-        // Display the error message returned by the API
-        console.error('Error adding vehicle:', error.response.data.error);
-      }
-    });
-}, 
+      axios.post('http://localhost:8080/parking_occupant/api/AddVehicle.php', 
+        JSON.stringify(vehicleData), 
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      .then(response => {
+        if (response.data.success) {
+          console.log('Vehicle added successfully!');
+
+        } else {
+          console.error('Error adding vehicle:', response.data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error adding vehicle:', error);
+      });
+
+
+  // Add vehicle to occupantVehicles array
+  this.occupantVehicles.push({
+    vehicle_type: this.vehicleType,
+    vehicle_color: this.vehicleColor,
+    vehicle_platenumber: this.vehiclePlateNumber,
+    vehicle_model: this.vehicleModel,
+    vehicle_brand: this.vehicleBrand
+  });
+
+  // Clear form fields
+  this.vehicleType = '';
+  this.vehicleColor = '';
+  this.vehiclePlateNumber = '';
+  this.vehicleModel = '';
+  this.vehicleBrand = '';
+
+  // Close the dialog
+  this.showAddVehicleForm = false;
+},
+
 fetchOccupantVehicles() {
   this.loadingVehicles = true;
   axios.get(`http://localhost:8080/parking_occupant/api/FetchOccupantVehicles.php?id=${this.occupantId}`)
     .then(response => {
       console.log('Response data:', response.data);
+      console.log('Occupant vehicles:', response.data.vehicles); // Add this line
       if (response.data && response.data.vehicles && Array.isArray(response.data.vehicles)) {
         this.occupantVehicles = response.data.vehicles;
         console.log('Occupant vehicles:', this.occupantVehicles);
@@ -451,8 +487,15 @@ fetchOccupantVehicles() {
       console.error('Error fetching occupant vehicles:', error);
       this.loadingVehicles = false;
     });
-},  
-  },
+}, 
+
+showVehicleId(item) {
+  this.selectedVehicleId = item.id; // or item.VehicleID, depending on the property name
+  this.showVehicleIdModal = true;
+}
+    
+
+},
 
 };
 </script>

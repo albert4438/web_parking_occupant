@@ -77,13 +77,7 @@ export default {
       // No need to implement anything here, the filteredOccupants computed property will take care of filtering the occupants array
     },
     viewOccupant(id) {
-      // const occupant = this.filteredOccupants.find(occupant => occupant.Occupant_ID === id);
-      // if (occupant) {
-      //   console.log('Occupant ID:', occupant.Occupant_ID);
-      //   this.$router.push({ name: 'view-action-occupant', params: { id: occupant.Occupant_ID } });
-      // } else {
-      //   console.error('Occupant not found:', id);
-      // }
+
       this.$router.push({ name: 'view-action-occupant', params: { id } });
     }
   }
