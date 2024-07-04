@@ -170,55 +170,41 @@
     </v-form>
 
     <v-flex xs12 md12>
-            <v-card flat>
-              <v-card-title>Occupant's Vehicles</v-card-title>
-              <v-card-text>
+  <v-card flat>
+    <v-card-title>Occupant's Vehicles</v-card-title>
+    <v-card-text>
+      <v-text-field
+        v-model="searchVehicle"
+        label="Search Vehicle"
+        solo
+        flat
+        outlined
+        dense
+      />
+      <v-data-table
+        :headers="vehicleHeaders"
+        :items="filteredVehicles"
+        :loading="loadingVehicles"
+      >
+        <template v-slot:item="{ item }">
+          <tr>
+            <td>{{ item.Vehicle_type }}</td>
+            <td>{{ item.Vehicle_color }}</td>
+            <td>{{ item.Vehicle_platenumber }}</td>
+            <td>{{ item.Vehicle_model }}</td>
+            <td>{{ item.Vehicle_brand }}</td>
+            <td>
+              <v-btn small color="primary" class="ml-2" @click="generateOccupantVehicleQrCode(item)">QR Code</v-btn>
+              <v-btn small color="warning" class="ml-2" @click="editVehicle(item)">Edit</v-btn>
+            </td>
+          </tr>
+        </template>
+      </v-data-table>
 
-                <v-data-table
-                  :headers="vehicleHeaders"
-                  :items="occupantVehicles"
-                  :loading="loadingVehicles"
-                >
-                <template v-slot:item="{ item }">
-                  <tr>
-                    <td>{{ item.Vehicle_type }}</td>
-                    <td>{{ item.Vehicle_color }}</td>
-                    <td>{{ item.Vehicle_platenumber }}</td>
-                    <td>{{ item.Vehicle_model }}</td>
-                    <td>{{ item.Vehicle_brand }}</td>
-                    <td>
-                      <v-btn small color="primary" class="ml-2" @click="showVehicleId(item)">QR Code</v-btn>
-                      <v-btn small color="warning" class="ml-2" @click="editVehicle(item)">Edit</v-btn>
-                    </td>
-                  </tr>
-                </template>
-                </v-data-table>
-
-                <v-btn color="primary" @click="showAddVehicleForm = true">Add Vehicle</v-btn>
-
-
-                        <!-- Modal to display vehicle ID -->
-                        <v-dialog v-model="showVehicleIdModal" max-width="300px">
-                        <v-card>
-                          <v-card-title>Vehicle ID</v-card-title>
-                          <!-- <v-tit>No QR Code yet! Please click the button to generate</v-tit> -->
-                           <v-car>
-                            <p>No QR Code yet! Please click the button to generate</p>
-                           </v-car>
-                          <!-- <v-card-text>
-                            <p>Vehicle ID: {{ selectedVehicleId }}</p>
-                          </v-card-text> -->
-                          <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn color="primary" @click="showVehicleIdModal = false">Generate</v-btn>
-                            <v-btn color="primary" @click="showVehicleIdModal = false">Close</v-btn>
-                          </v-card-actions>
-                        </v-card>
-                      </v-dialog>
-
-              </v-card-text>
-            </v-card>
-          </v-flex>
+      <v-btn color="primary" @click="showAddVehicleForm = true">Add Vehicle</v-btn>
+    </v-card-text>
+  </v-card>
+</v-flex>
 
           <v-dialog v-model="showAddVehicleForm" max-width="500px">
       <v-card>
@@ -288,13 +274,39 @@
     </v-dialog>
 
 
+    <v-dialog v-model="QRCODEModal" max-width="600px">
+      <v-card>
+        <v-card-title class="headline">QR Code</v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-layout wrap justify-center>
+              <v-flex xs12>
+                <div v-if="qrCodeUrl">
+                  <img :src="qrCodeUrl" alt="QR Code" />
+                </div>
+                <div v-else>
+                  <p>No QR code available. Please click the 'Generate' button below.</p>
+                  <v-btn color="primary" @click="generateQrCode">Generate</v-btn>
+                </div>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="QRCODEModal = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
   </div>
   
 </template>
 
 <script>
 import axios from 'axios';
-// import qrcode from 'qrcode';
+import QRCode from 'qrcode';
+import CryptoJS from 'crypto-js'; // Import crypto-js library
 
 export default {
   props: {
@@ -303,14 +315,11 @@ export default {
       required: true
     }
   },
-  computed: {
-    isEmptyPersonnel() {
-      return !this.personnelRole && !this.personnelUsername && !this.personnelPassword && !this.personnelJobTitle && !this.personnelStatus;
-    }
-  },
   data() {
     return {
-      showVehicleIdModal: false,
+      searchVehicle: '',
+      QRCODEModal: false,
+      selectedOccupantId: null,
       selectedVehicleId: null,
       editMode: false,
       showAddVehicleForm: false,
@@ -342,12 +351,29 @@ export default {
         { text: 'Action', value: 'action' },
       ],
       loadingVehicles: false,
+      qrCodeUrl: '',
+      encryptionKey: 'your-secret-key', // Define your secret encryption key
     };
+  },
+  computed: {
+    filteredVehicles() {
+      return this.occupantVehicles.filter(vehicle => {
+        return (
+          vehicle.Vehicle_type.toLowerCase().includes(this.searchVehicle.toLowerCase()) ||
+          vehicle.Vehicle_color.toLowerCase().includes(this.searchVehicle.toLowerCase()) ||
+          vehicle.Vehicle_platenumber.toLowerCase().includes(this.searchVehicle.toLowerCase()) ||
+          vehicle.Vehicle_model.toLowerCase().includes(this.searchVehicle.toLowerCase()) ||
+          vehicle.Vehicle_brand.toLowerCase().includes(this.searchVehicle.toLowerCase())
+        );
+      });
+    },
+    isEmptyPersonnel() {
+      return !this.personnelRole && !this.personnelUsername && !this.personnelPassword && !this.personnelJobTitle && !this.personnelStatus;
+    }
   },
   mounted() {
     this.fetchOccupantDetails();
     this.fetchOccupantVehicles();
-    // this.fetchOccupantVehicles(); Uncomment if needed
   },
   methods: {
     goBack() {
@@ -363,7 +389,7 @@ export default {
     cancelEdit() {
       this.editMode = false;
     },
-      fetchOccupantDetails() {
+    fetchOccupantDetails() {
       console.log(`Fetching details for occupant ID: ${this.occupantId}`);
       axios.get(`http://localhost:8080/parking_occupant/api/FetchOccupantDetails.php?id=${this.occupantId}`)
         .then(response => {
@@ -416,8 +442,7 @@ export default {
           console.error('Error updating occupant details:', error);
         });
     },
-
-     addVehicle() {
+    addVehicle() {
       const vehicleData = {
         occupantId: this.occupantId,
         vehicleType: this.vehicleType,
@@ -427,76 +452,109 @@ export default {
         vehicleBrand: this.vehicleBrand
       };
 
-      axios.post('http://localhost:8080/parking_occupant/api/AddVehicle.php', 
-        JSON.stringify(vehicleData), 
+      axios.post('http://localhost:8080/parking_occupant/api/AddVehicle.php',
+        JSON.stringify(vehicleData),
         {
           headers: {
             'Content-Type': 'application/json'
           }
         }
       )
-      .then(response => {
-        if (response.data.success) {
-          console.log('Vehicle added successfully!');
+        .then(response => {
+          if (response.data.success) {
+            console.log('Vehicle added successfully!');
 
-        } else {
-          console.error('Error adding vehicle:', response.data.error);
-        }
-      })
-      .catch(error => {
-        console.error('Error adding vehicle:', error);
+          } else {
+            console.error('Error adding vehicle:', response.data.error);
+          }
+        })
+        .catch(error => {
+          console.error('Error adding vehicle:', error);
+        });
+
+      // Add vehicle to occupantVehicles array
+      this.occupantVehicles.push({
+        vehicle_type: this.vehicleType,
+        vehicle_color: this.vehicleColor,
+        vehicle_platenumber: this.vehiclePlateNumber,
+        vehicle_model: this.vehicleModel,
+        vehicle_brand: this.vehicleBrand
       });
 
+      // Clear form fields
+      this.vehicleType = '';
+      this.vehicleColor = '';
+      this.vehiclePlateNumber = '';
+      this.vehicleModel = '';
+      this.vehicleBrand = '';
 
-  // Add vehicle to occupantVehicles array
-  this.occupantVehicles.push({
-    vehicle_type: this.vehicleType,
-    vehicle_color: this.vehicleColor,
-    vehicle_platenumber: this.vehiclePlateNumber,
-    vehicle_model: this.vehicleModel,
-    vehicle_brand: this.vehicleBrand
-  });
+      // Close the dialog
+      this.showAddVehicleForm = false;
+    },
+    fetchOccupantVehicles() {
+      this.loadingVehicles = true;
+      axios.get(`http://localhost:8080/parking_occupant/api/FetchOccupantVehicles.php?id=${this.occupantId}`)
+        .then(response => {
+          console.log('Response data:', response.data);
+          console.log('Occupant vehicles:', response.data.vehicles);
+          if (response.data && response.data.vehicles && Array.isArray(response.data.vehicles)) {
+            this.occupantVehicles = response.data.vehicles;
+            console.log('Occupant vehicles:', this.occupantVehicles);
+          } else {
+            console.error('Invalid response structure:', response.data);
+            this.occupantVehicles = [];
+          }
+          this.loadingVehicles = false;
+        })
+        .catch(error => {
+          console.error('Error fetching occupant vehicles:', error);
+          this.loadingVehicles = false;
+        });
+    },
 
-  // Clear form fields
-  this.vehicleType = '';
-  this.vehicleColor = '';
-  this.vehiclePlateNumber = '';
-  this.vehicleModel = '';
-  this.vehicleBrand = '';
-
-  // Close the dialog
-  this.showAddVehicleForm = false;
-},
-
-fetchOccupantVehicles() {
-  this.loadingVehicles = true;
-  axios.get(`http://localhost:8080/parking_occupant/api/FetchOccupantVehicles.php?id=${this.occupantId}`)
-    .then(response => {
-      console.log('Response data:', response.data);
-      console.log('Occupant vehicles:', response.data.vehicles); // Add this line
-      if (response.data && response.data.vehicles && Array.isArray(response.data.vehicles)) {
-        this.occupantVehicles = response.data.vehicles;
-        console.log('Occupant vehicles:', this.occupantVehicles);
-      } else {
-        console.error('Invalid response structure:', response.data);
-        this.occupantVehicles = []; 
-      }
-      this.loadingVehicles = false;
-    })
-    .catch(error => {
-      console.error('Error fetching occupant vehicles:', error);
-      this.loadingVehicles = false;
-    });
-}, 
-
-showVehicleId(item) {
-  this.selectedVehicleId = item.id; // or item.VehicleID, depending on the property name
-  this.showVehicleIdModal = true;
-}
+    // generateOccupantVehicleQrCode(item) {
+    //   console.log('Item ID:', item.id);
+    //   this.selectedVehicleId = item.Vehicle_ID;
+    //   this.selectedOccupantId = this.occupantId;
+    //   console.log('Selected Vehicle ID:', this.selectedVehicleId);
+    //   console.log('Selected Occupant ID:', this.selectedOccupantId);
+      
+    //   this.QRCODEModal = true;
+    //   this.qrCodeUrl = ''; // Reset QR code URL
+    // },
     
+    encryptData(data) {
+      return CryptoJS.AES.encrypt(JSON.stringify(data), this.encryptionKey).toString();
+    },
+    generateQrCode() {
+      const qrCodeData = {
+        vehicleId: this.selectedVehicleId,
+        occupantId: this.selectedOccupantId
+      };
 
-},
+      const encryptedData = this.encryptData(qrCodeData);
 
+      // Generate QR code
+      QRCode.toDataURL(encryptedData)
+        .then(url => {
+          this.qrCodeUrl = url;
+        })
+        .catch(err => {
+          console.error('Error generating QR code:', err);
+        });
+    },
+
+    generateOccupantVehicleQrCode(item) {
+      this.selectedVehicleId = item.Vehicle_ID;
+      this.selectedOccupantId = this.occupantId;
+
+      this.QRCODEModal = true;
+      this.qrCodeUrl = ''; // Reset QR code URL
+
+      // Call generateQrCode to create the QR code
+      this.generateQrCode();
+    }
+  },
 };
 </script>
 
