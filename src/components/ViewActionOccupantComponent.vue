@@ -281,6 +281,8 @@
       <v-container>
         <v-layout wrap justify-center>
           <v-flex xs12>
+
+
             <div v-if="qrCodeUrl">
               <img :src="qrCodeUrl" alt="QR Code" />
             </div>
@@ -288,6 +290,8 @@
               <p>No QR code available. Please click the 'Generate' button below.</p>
               <v-btn color="primary" @click="generateQrCode">Generate</v-btn>
             </div>
+
+
           </v-flex>
         </v-layout>
       </v-container>
@@ -319,6 +323,7 @@ export default {
   },
   data() {
     return {
+      encryptionKey: process.env.VUE_APP_AES_KEY, // Define your secret encryption key
       searchVehicle: '',
       QRCODEModal: false,
       selectedOccupantId: null,
@@ -354,7 +359,7 @@ export default {
       ],
       loadingVehicles: false,
       qrCodeUrl: '',
-      encryptionKey: 'your-secret-key', // Define your secret encryption key
+
     };
   },
   computed: {
@@ -509,43 +514,91 @@ export default {
       }
     },
 
+    // encryptData(data) {
+    //   return CryptoJS.AES.encrypt(JSON.stringify(data), this.encryptionKey).toString();
+    // },
+
     encryptData(data) {
-      return CryptoJS.AES.encrypt(JSON.stringify(data), this.encryptionKey).toString();
+      try {
+        return CryptoJS.AES.encrypt(JSON.stringify(data), this.encryptionKey).toString();
+      } catch (error) {
+        console.error('Encryption error:', error);
+        return null;
+      }
     },
 
+    // generateQrCode() {
+    //   const qrCodeData = {
+    //     vehicleId: this.selectedVehicleId,
+    //     occupantId: this.selectedOccupantId
+    //   };
+
+    //   const encryptedData = this.encryptData(qrCodeData);
+
+    //   // Generate QR code
+    //   QRCode.toDataURL(encryptedData)
+    //     .then(url => {
+    //       this.qrCodeUrl = url;
+
+    //       axios.post('http://localhost:8080/parking_occupant/api/SaveVehicleQrCode.php', {
+    //         occupantId: this.selectedOccupantId,
+    //         vehicleId: this.selectedVehicleId,
+    //         qrCode: url.split(',')[1]  // Only send base64 part
+    //       })
+    //       .then(response => {
+    //         if (response.data.success) {
+    //           console.log('QR code saved successfully!');
+    //         } else {
+    //           console.error('Error saving QR code:', response.data.error);
+    //         }
+    //       })
+    //       .catch(error => {
+    //         console.error('Error saving QR code:', error);
+    //       });
+    //     })
+    //     .catch(err => {
+    //       console.error('Error generating QR code:', err);
+    //     });
+    // },
+
     generateQrCode() {
-    const qrCodeData = {
-      vehicleId: this.selectedVehicleId,
-      occupantId: this.selectedOccupantId
-    };
+  const qrCodeData = {
+    vehicleId: this.selectedVehicleId,
+    occupantId: this.selectedOccupantId
+  };
 
-    const encryptedData = this.encryptData(qrCodeData);
+  if (!this.encryptionKey) {
+    console.error('Encryption key is not defined.');
+    return;
+  }
 
-    // Generate QR code
-    QRCode.toDataURL(encryptedData)
-      .then(url => {
-        this.qrCodeUrl = url;
+  const encryptedData = this.encryptData(qrCodeData);
 
-        axios.post('http://localhost:8080/parking_occupant/api/SaveVehicleQrCode.php', {
-          occupantId: this.selectedOccupantId,
-          vehicleId: this.selectedVehicleId,
-          qrCode: url.split(',')[1]  // Only send base64 part
-        })
-        .then(response => {
-          if (response.data.success) {
-            console.log('QR code saved successfully!');
-          } else {
-            console.error('Error saving QR code:', response.data.error);
-          }
-        })
-        .catch(error => {
-          console.error('Error saving QR code:', error);
-        });
+  // Generate QR code
+  QRCode.toDataURL(encryptedData)
+    .then(url => {
+      this.qrCodeUrl = url;
+
+      axios.post('http://localhost:8080/parking_occupant/api/SaveVehicleQrCode.php', {
+        occupantId: this.selectedOccupantId,
+        vehicleId: this.selectedVehicleId,
+        qrCode: url.split(',')[1]  // Only send base64 part
       })
-      .catch(err => {
-        console.error('Error generating QR code:', err);
+      .then(response => {
+        if (response.data.success) {
+          console.log('QR code saved successfully!');
+        } else {
+          console.error('Error saving QR code:', response.data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error saving QR code:', error);
       });
-  },
+    })
+    .catch(err => {
+      console.error('Error generating QR code:', err);
+    });
+},
 
     DisplayQRCODEOccupantVehicle(item) {
     this.selectedVehicleId = item.Vehicle_ID;
@@ -571,7 +624,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 @import '~@fortawesome/fontawesome-free/css/all.css';
