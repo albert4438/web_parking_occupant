@@ -194,7 +194,7 @@
             <td>{{ item.Vehicle_model }}</td>
             <td>{{ item.Vehicle_brand }}</td>
             <td>
-              <v-btn small color="primary" class="ml-2" @click="DisplayQRCODEOccupantVehicle(item)">QR Code</v-btn>
+              <v-btn small color="primary" class="ml-2" @click="showQRCodeModal(item)">QR Code</v-btn>
               <v-btn small color="warning" class="ml-2" @click="editVehicle(item)">Edit</v-btn>
             </td>
           </tr>
@@ -323,7 +323,8 @@ export default {
   },
   data() {
     return {
-      encryptionKey: process.env.VUE_APP_AES_KEY, // Define your secret encryption key
+      // encryptionKey: process.env.VUE_APP_AES_KEY, // Define your secret encryption key
+      encryptionKey: CryptoJS.enc.Hex.parse(process.env.VUE_APP_AES_KEY), // Use hex-encoded key
       searchVehicle: '',
       QRCODEModal: false,
       selectedOccupantId: null,
@@ -514,93 +515,60 @@ export default {
       }
     },
 
-    // encryptData(data) {
-    //   return CryptoJS.AES.encrypt(JSON.stringify(data), this.encryptionKey).toString();
-    // },
-
     encryptData(data) {
       try {
-        return CryptoJS.AES.encrypt(JSON.stringify(data), this.encryptionKey).toString();
+        const iv = CryptoJS.lib.WordArray.random(16);
+        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), this.encryptionKey, {
+          iv: iv,
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7
+        });
+        const ivBase64 = CryptoJS.enc.Base64.stringify(iv);
+        const encryptedBase64 = encrypted.toString();
+        return `${ivBase64}:${encryptedBase64}`;
       } catch (error) {
         console.error('Encryption error:', error);
         return null;
       }
     },
 
-    // generateQrCode() {
-    //   const qrCodeData = {
-    //     vehicleId: this.selectedVehicleId,
-    //     occupantId: this.selectedOccupantId
-    //   };
-
-    //   const encryptedData = this.encryptData(qrCodeData);
-
-    //   // Generate QR code
-    //   QRCode.toDataURL(encryptedData)
-    //     .then(url => {
-    //       this.qrCodeUrl = url;
-
-    //       axios.post('http://localhost:8080/parking_occupant/api/SaveVehicleQrCode.php', {
-    //         occupantId: this.selectedOccupantId,
-    //         vehicleId: this.selectedVehicleId,
-    //         qrCode: url.split(',')[1]  // Only send base64 part
-    //       })
-    //       .then(response => {
-    //         if (response.data.success) {
-    //           console.log('QR code saved successfully!');
-    //         } else {
-    //           console.error('Error saving QR code:', response.data.error);
-    //         }
-    //       })
-    //       .catch(error => {
-    //         console.error('Error saving QR code:', error);
-    //       });
-    //     })
-    //     .catch(err => {
-    //       console.error('Error generating QR code:', err);
-    //     });
-    // },
-
     generateQrCode() {
-  const qrCodeData = {
-    vehicleId: this.selectedVehicleId,
-    occupantId: this.selectedOccupantId
-  };
-
-  if (!this.encryptionKey) {
-    console.error('Encryption key is not defined.');
-    return;
-  }
-
-  const encryptedData = this.encryptData(qrCodeData);
-
-  // Generate QR code
-  QRCode.toDataURL(encryptedData)
-    .then(url => {
-      this.qrCodeUrl = url;
-
-      axios.post('http://localhost:8080/parking_occupant/api/SaveVehicleQrCode.php', {
-        occupantId: this.selectedOccupantId,
+      const qrCodeData = {
         vehicleId: this.selectedVehicleId,
-        qrCode: url.split(',')[1]  // Only send base64 part
-      })
-      .then(response => {
-        if (response.data.success) {
-          console.log('QR code saved successfully!');
-        } else {
-          console.error('Error saving QR code:', response.data.error);
-        }
-      })
-      .catch(error => {
-        console.error('Error saving QR code:', error);
-      });
-    })
-    .catch(err => {
-      console.error('Error generating QR code:', err);
-    });
-},
+        occupantId: this.selectedOccupantId
+      };
 
-    DisplayQRCODEOccupantVehicle(item) {
+      const encryptedData = this.encryptData(qrCodeData);
+
+      if (encryptedData) {
+        QRCode.toDataURL(encryptedData)
+          .then(url => {
+            this.qrCodeUrl = url;
+            axios.post('http://localhost:8080/parking_occupant/api/SaveVehicleQrCode.php', {
+              occupantId: this.selectedOccupantId,
+              vehicleId: this.selectedVehicleId,
+              qrCode: url.split(',')[1]
+            })
+            .then(response => {
+              if (response.data.success) {
+                console.log('QR code saved successfully!');
+              } else {
+                console.error('Error saving QR code:', response.data.error);
+              }
+            })
+            .catch(error => {
+              console.error('Error saving QR code:', error);
+            });
+          })
+          .catch(err => {
+            console.error('Error generating QR code:', err);
+          });
+      } else {
+        console.error('Failed to encrypt data for QR code');
+      }
+    },
+
+    showQRCodeModal(item) {
     this.selectedVehicleId = item.Vehicle_ID;
     this.selectedOccupantId = this.occupantId;
 
@@ -626,6 +594,9 @@ export default {
 </script>
 
 <style scoped>
-@import '~@fortawesome/fontawesome-free/css/all.css';
-@import '~material-design-icons-iconfont/dist/material-design-icons.css';
+.QRCode-modal {
+  text-align: center;
+  width: 300px;
+  margin: 0 auto;
+}
 </style>
