@@ -3,215 +3,93 @@
     <v-btn color="primary" @click="$router.push({ name: 'occupant' })" style="margin-bottom: 14px;">Back</v-btn>
 
     <v-form>
-      <v-container grid-  -md style="border: 1px solid #ccc; border-radius: 10px; padding: 10px;">
-        <v-layout wrap>
-          <v-flex xs12 md6>
-  <v-card flat>
-    <v-card-title></v-card-title>
-    <v-card-text>
-      <v-layout wrap>
-        <v-flex xs12 md6>
-          <v-text-field
-            v-model="personnelRole"
-            label="Role"
-            :disabled="!(editMode && personnelRole)"
-            solo
-            flat
-            outlined
-            dense
-          />
-        </v-flex>
-        <v-flex xs12 md6>
-          <v-text-field
-            v-model="personnelUsername"
-            label="Username"
-            :disabled="!(editMode && personnelUsername)"
-            solo
-            flat
-            outlined
-            dense
-          />
-        </v-flex>
-        <v-flex xs12 md6>
-          <v-text-field
-            v-model="personnelPassword"
-            label="Password"
-            :disabled="!(editMode && personnelPassword)"
-            type="password"
-            solo
-            flat
-            outlined
-            dense
-          />
-        </v-flex>
-        <v-flex xs12 md6>
-          <v-text-field
-            v-model="personnelJobTitle"
-            label="Job Title"
-            :disabled="!(editMode && personnelJobTitle)"
-            solo
-            flat
-            outlined
-            dense
-          />
-        </v-flex>
-        <v-flex xs12 md6>
-          <v-text-field
-            v-model="personnelStatus"
-            label="Status"
-            :disabled="!(editMode && personnelStatus)"
-            solo
-            flat
-            outlined
-            dense
-          />
-        </v-flex>
+      <v-container grid-list-md class="profile-container">
+        <v-layout row wrap align-center>
+          <v-flex xs12 sm3 md3>
+            <div class="profile-picture">
+              <v-avatar size="200" class="blue-border">
+                <img :src="profilePictureUrl" alt="Profile Picture">
+              </v-avatar>
+            </div>
+          </v-flex>
+          <v-flex xs12 sm9 md9>
+            <div class="profile-info" style="text-align: left;">
+              <h2>{{ profileFirstname }} {{ profileLastname }}
+                <v-btn icon color="primary" class="edit-icon" @click="editModal = true">
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+              </h2>
 
-        <v-flex xs12 md6>
-          <v-text-field
-            v-model="personnelRole"
-            label="Role"
-            :disabled="!(editMode && personnelRole)"
-            solo
-            flat
-            outlined
-            dense
-          />
-        </v-flex>
-
-      </v-layout>
-    </v-card-text>
-  </v-card>
-</v-flex>
-          <v-flex xs12 md6>
-            <v-card flat>
-              <v-card-title></v-card-title>
-              <v-card-text>
-                <v-layout wrap>
-                  <v-flex xs12 md6>
-                    <v-text-field
-                      v-model="profileFirstname"
-                      label="First Name"
-                      :disabled="!editMode"
-                      solo
-                      flat
-                      outlined
-                      dense
-                    />
-                  </v-flex>
-                  <v-flex xs12 md6>
-                    <v-text-field
-                      v-model="profileMiddlename"
-                      label="Middle Name"
-                      :disabled="!editMode"
-                      solo
-                      flat
-                      outlined
-                      dense
-                    />
-                  </v-flex>
-                  <v-flex xs12 md6>
-                    <v-text-field
-                      v-model="profileLastname"
-                      label="Last Name"
-                      :disabled="!editMode"
-                      solo
-                      flat
-                      outlined
-                      dense
-                    />
-                  </v-flex>
-                  <v-flex xs12 md6>
-                    <v-text-field
-                      v-model="profileBirthdate"
-                      label="Birthdate"
-                      :disabled="!editMode"
-                      solo
-                      flat
-                      outlined
-                      dense
-                    />
-                  </v-flex>
-                  <v-flex xs12 md6>
-                    <v-text-field
-                      v-model="profileAddress"
-                      label="Address"
-                      :disabled="!editMode"
-                      solo
-                      flat
-                      outlined
-                      dense
-                    />
-                  </v-flex>
-                  <v-flex xs12 md6>
-                    <v-text-field
-                      v-model="profilePhonenumber"
-                      label="Phone Number"
-                      :disabled="!editMode"
-                      solo
-                      flat
-                      outlined
-                      dense
-                    />
-                  </v-flex>
-                </v-layout>
-              </v-card-text>
-            </v-card>
+              <div class="profile-detail">
+                <v-icon small>mdi-cake</v-icon>
+                Birthdate: {{ profileBirthdate }}
+              </div>
+              <div class="profile-detail">
+                <v-icon small>mdi-map-marker</v-icon>
+                Address: {{ profileAddress }}
+              </div>
+              <div class="profile-detail">
+                <v-icon small>mdi-phone</v-icon>
+                Phone Number: {{ profilePhonenumber }}
+              </div>
+            </div>
           </v-flex>
         </v-layout>
-
-        <div style="margin-bottom: 5px;">
-          <v-btn color="primary" @click="toggleEditMode" class="mr-2">
-            {{ editMode ? 'Save' : 'Edit' }}
-          </v-btn>
-          <v-btn color="error" @click="cancelEdit" :disabled="!editMode">Cancel</v-btn>
-        </div>
       </v-container>
     </v-form>
 
     <v-flex xs12 md12>
-  <v-card flat>
-    <v-card-title>Occupant's Vehicles</v-card-title>
-    <v-card-text>
-      <v-text-field
-        v-model="searchVehicle"
-        label="Search Vehicle"
-        solo
-        flat
-        outlined
-        dense
-      />
-      <v-data-table
-        :headers="vehicleHeaders"
-        :items="filteredVehicles"
-        :loading="loadingVehicles"
-      >
-        <template v-slot:item="{ item }">
-          <tr>
-            <td>{{ item.Vehicle_type }}</td>
-            <td>{{ item.Vehicle_color }}</td>
-            <td>{{ item.Vehicle_platenumber }}</td>
-            <td>{{ item.Vehicle_model }}</td>
-            <td>{{ item.Vehicle_brand }}</td>
-            <td>
-              <v-btn small color="primary" class="ml-2" @click="showQRCodeModal(item)">QR Code</v-btn>
-              <v-btn small color="warning" class="ml-2" @click="editVehicle(item)">Edit</v-btn>
-            </td>
-          </tr>
-        </template>
-      </v-data-table>
+      <v-card flat>
+        <v-card-title>Occupant's Vehicles</v-card-title>
+        <v-card-text>
+          <v-text-field
+            v-model="searchVehicle"
+            label="Search Vehicle"
+            solo
+            flat
+            outlined
+            dense
+          />
+          <v-data-table
+            :headers="vehicleHeaders"
+            :items="filteredVehicles"
+            :loading="loadingVehicles"
+          >
+            <template v-slot:item="{ item }">
+              <tr>
+                <td>{{ item.Vehicle_type }}</td>
+                <td>{{ item.Vehicle_color }}</td>
+                <td>{{ item.Vehicle_platenumber }}</td>
+                <td>{{ item.Vehicle_model }}</td>
+                <td>{{ item.Vehicle_brand }}</td>
+                <td>
+                  <v-btn small color="primary" class="ml-2" @click="showQRCodeModal(item)">QR Code</v-btn>
+                  <v-btn small color="warning" class="ml-2" @click="editVehicle(item)">Edit</v-btn>
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
 
-      <v-btn color="primary" @click="showAddVehicleForm = true">Add Vehicle</v-btn>
-    </v-card-text>
-  </v-card>
-</v-flex>
+          <v-btn color="primary" @click="showAddVehicleForm = true">Add Vehicle</v-btn>
+        </v-card-text>
+      </v-card>
+    </v-flex>
 
-          <v-dialog v-model="showAddVehicleForm" max-width="500px">
+    <v-dialog v-model="showAddVehicleForm" max-width="500px">
       <v-card>
         <v-card-title>Add Vehicle</v-card-title>
         <v-card-text>
           <v-form>
             <v-layout wrap>
+
+
+              <!-- <v-col cols="12" sm="6">
+                <v-text-field v-model="formData.vehicleType" label="Vehicle Type" required outlined></v-text-field>
+              </v-col> -->
+              <v-col cols="12" sm="6">
+                <v-text-field label="Vehicle Type" required outlined></v-text-field>
+              </v-col>
+              
               <v-flex xs12 md6>
                 <v-text-field
                   v-model="vehicleType"
@@ -222,6 +100,7 @@
                   dense
                 />
               </v-flex>
+
               <v-flex xs12 md6>
                 <v-text-field
                   v-model="vehicleColor"
@@ -232,6 +111,7 @@
                   dense
                 />
               </v-flex>
+              
               <v-flex xs12 md6>
                 <v-text-field
                   v-model="vehiclePlateNumber"
@@ -273,41 +153,93 @@
       </v-card>
     </v-dialog>
 
-
     <v-dialog v-model="QRCODEModal" max-width="600px">
-  <v-card>
-    <v-card-title class="headline">QR Code</v-card-title>
-    <v-card-text>
-      <v-container>
-        <v-layout wrap justify-center>
-          <v-flex xs12>
+      <v-card>
+        <v-card-title class="headline">QR Code</v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-layout wrap justify-center>
+              <v-flex xs12>
+                <div v-if="qrCodeUrl">
+                  <img :src="qrCodeUrl" alt="QR Code" />
+                </div>
+                <div v-else>
+                  <p>No QR code available. Please click the 'Generate' button below.</p>
+                  <v-btn color="primary" @click="generateQrCode">Generate</v-btn>
+                </div>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="QRCODEModal = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-
-            <div v-if="qrCodeUrl">
-              <img :src="qrCodeUrl" alt="QR Code" />
-            </div>
-            <div v-else>
-              <p>No QR code available. Please click the 'Generate' button below.</p>
-              <v-btn color="primary" @click="generateQrCode">Generate</v-btn>
-            </div>
-
-
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-card-text>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn color="blue darken-1" text @click="QRCODEModal = false">Close</v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
-
-
-
+    <v-dialog v-model="editModal" max-width="700px">
+      <v-card>
+        <v-card-title class="headline primary--text">
+          <v-icon left class="mr-2">mdi-account-edit</v-icon> Edit Profile
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="form" v-model="valid" lazy-validation>
+            <v-container>
+              <v-row>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="personnelUsername"
+                    label="Username"
+                    required
+                    outlined
+                  />
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="personnelPassword"
+                    label="Password"
+                    required
+                    outlined
+                    type="password"
+                  />
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    v-model="profilePhonenumber"
+                    label="Phone Number"
+                    required
+                    outlined
+                  />
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-textarea
+                    v-model="profileAddress"
+                    label="Address"
+                    required
+                    outlined
+                  />
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="saveProfileChanges">
+            <v-icon left>mdi-content-save</v-icon> Save
+          </v-btn>
+          <v-btn color="error" @click="editModal = false">
+            <v-icon left>mdi-close-circle</v-icon> Cancel
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
-  
 </template>
+
+
+
 
 <script>
 import axios from 'axios';
@@ -321,9 +253,11 @@ export default {
       required: true
     }
   },
+  
   data() {
     return {
-      // encryptionKey: process.env.VUE_APP_AES_KEY, // Define your secret encryption key
+      editModal: false,
+      //encryptionKey: process.env.VUE_APP_AES_KEY, // Define your secret encryption key
       encryptionKey: CryptoJS.enc.Hex.parse(process.env.VUE_APP_AES_KEY), // Use hex-encoded key
       searchVehicle: '',
       QRCODEModal: false,
@@ -390,12 +324,14 @@ export default {
       this.$emit('back');
     },
     toggleEditMode() {
-      this.editMode = !this.editMode;
-      if (!this.editMode) {
-        // Save changes
-        this.saveOccupantDetails();
+      this.editMode =!this.editMode;
+      if (this.editMode) {
+        this.editModal = true;
+      } else {
+        this.saveProfileChanges();
       }
     },
+
     cancelEdit() {
       this.editMode = false;
     },
@@ -416,6 +352,7 @@ export default {
             this.profileBirthdate = profile.Birthdate || '';
             this.profileAddress = profile.Address || '';
             this.profilePhonenumber = profile.Phonenumber || '';
+            this.profilePictureUrl = profile.ProfilePicture || '';
           } else {
             console.error('Invalid response structure:', response.data);
           }
@@ -424,16 +361,10 @@ export default {
           console.error('Error fetching occupant details:', error);
         });
     },
-    saveOccupantDetails() {
+    saveProfileChanges() {
+      // Save the changes to the profile information
       axios.post(`http://localhost:8080/parking_occupant/api/UpdateOccupantDetails.php`, {
         occupantId: this.occupantId,
-        personnel: {
-          Role_ID: this.personnelRole,
-          usr_username: this.personnelUsername,
-          usr_password: this.personnelPassword,
-          jobTitle: this.personnelJobTitle,
-          Status: this.personnelStatus
-        },
         profile: {
           Firstname: this.profileFirstname,
           Middlename: this.profileMiddlename,
@@ -443,14 +374,15 @@ export default {
           Phonenumber: this.profilePhonenumber
         }
       })
-        .then(response => {
-          if (!response.data.success) {
-            console.error('Error updating occupant details:', response.data.error);
-          }
-        })
-        .catch(error => {
-          console.error('Error updating occupant details:', error);
-        });
+     .then(response => {
+        if (!response.data.success) {
+          console.error('Error updating occupant details:', response.data.error);
+        }
+      })
+     .catch(error => {
+        console.error('Error updating occupant details:', error);
+      });
+      this.editModal = false;
     },
 
     addVehicle() {
@@ -599,4 +531,37 @@ export default {
   width: 300px;
   margin: 0 auto;
 }
+
+.profile-container {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #fff;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.profile-info {
+  flex: 1;
+  margin-left: 20px;
+  text-align: left;
+}
+
+.blue-border {
+  border: 3px solid #217BD4;
+}
+.profile-picture {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+  .profile-detail {
+    margin-top: 5px;
+  }
 </style>
