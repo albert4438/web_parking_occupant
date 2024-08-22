@@ -239,12 +239,10 @@
 </template>
 
 
-
-
 <script>
 import axios from 'axios';
 import QRCode from 'qrcode';
-import CryptoJS from 'crypto-js'; // Import crypto-js library
+import { encryptData } from '@/utils/encryption'; // Import encryption function
 
 export default {
   props: {
@@ -257,8 +255,6 @@ export default {
   data() {
     return {
       editModal: false,
-      //encryptionKey: process.env.VUE_APP_AES_KEY, // Define your secret encryption key
-      encryptionKey: CryptoJS.enc.Hex.parse(process.env.VUE_APP_AES_KEY), // Use hex-encoded key
       searchVehicle: '',
       QRCODEModal: false,
       selectedOccupantId: null,
@@ -294,13 +290,12 @@ export default {
       ],
       loadingVehicles: false,
       qrCodeUrl: '',
-
     };
   },
   computed: {
     filteredVehicles() {
       return this.occupantVehicles.filter(vehicle => {
-        if (!vehicle) return false; // Add this check
+        if (!vehicle) return false;
         return (
           (vehicle.Vehicle_type && vehicle.Vehicle_type.toLowerCase().includes(this.searchVehicle.toLowerCase())) ||
           (vehicle.Vehicle_color && vehicle.Vehicle_color.toLowerCase().includes(this.searchVehicle.toLowerCase())) ||
@@ -313,7 +308,6 @@ export default {
     isEmptyPersonnel() {
       return !this.personnelRole && !this.personnelUsername && !this.personnelPassword && !this.personnelJobTitle && !this.personnelStatus;
     },
-    
   },
   mounted() {
     this.fetchOccupantDetails();
@@ -324,17 +318,17 @@ export default {
       this.$emit('back');
     },
     toggleEditMode() {
-      this.editMode =!this.editMode;
+      this.editMode = !this.editMode;
       if (this.editMode) {
         this.editModal = true;
       } else {
         this.saveProfileChanges();
       }
     },
-
     cancelEdit() {
       this.editMode = false;
     },
+    
     fetchOccupantDetails() {
       console.log(`Fetching details for occupant ID: ${this.occupantId}`);
       axios.get(`http://localhost:8080/parking_occupant/api/FetchOccupantDetails.php?id=${this.occupantId}`)
@@ -361,8 +355,8 @@ export default {
           console.error('Error fetching occupant details:', error);
         });
     },
+
     saveProfileChanges() {
-      // Save the changes to the profile information
       axios.post(`http://localhost:8080/parking_occupant/api/UpdateOccupantDetails.php`, {
         occupantId: this.occupantId,
         profile: {
@@ -374,62 +368,57 @@ export default {
           Phonenumber: this.profilePhonenumber
         }
       })
-     .then(response => {
+      .then(response => {
         if (!response.data.success) {
           console.error('Error updating occupant details:', response.data.error);
         }
       })
-     .catch(error => {
+      .catch(error => {
         console.error('Error updating occupant details:', error);
       });
       this.editModal = false;
     },
-
     addVehicle() {
-  const vehicleData = {
-    occupantId: this.occupantId,
-    vehicleType: this.vehicleType,
-    vehicleColor: this.vehicleColor,
-    vehiclePlateNumber: this.vehiclePlateNumber,
-    vehicleModel: this.vehicleModel,
-    vehicleBrand: this.vehicleBrand
-  };
+      const vehicleData = {
+        occupantId: this.occupantId,
+        vehicleType: this.vehicleType,
+        vehicleColor: this.vehicleColor,
+        vehiclePlateNumber: this.vehiclePlateNumber,
+        vehicleModel: this.vehicleModel,
+        vehicleBrand: this.vehicleBrand
+      };
 
-  axios.post('http://localhost:8080/parking_occupant/api/AddVehicle.php',
-    JSON.stringify(vehicleData),
-    {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }
-  )
-  .then(response => {
-    if (response && response.data) {
-      if (response.data.success) {
-        console.log('Vehicle added successfully!', response.data);
-        alert('Vehicle added successfully');
-        // Clear form fields
-        this.vehicleType = '';
-        this.vehicleColor = '';
-        this.vehiclePlateNumber = '';
-        this.vehicleModel = '';
-        this.vehicleBrand = '';
-        // Close the dialog
-        this.showAddVehicleForm = false;
-        // Update the occupantVehicles array with fresh data from the server
-        this.fetchOccupantVehicles(); // Call the fetchOccupantVehicles method to update the array
-      } else {
-        console.error('Error adding vehicle:', response.data.error);
-      }
-    } else {
-      console.error('Error adding vehicle: undefined response');
-    }
-  })
-  .catch(error => {
-    console.error('Error adding vehicle:', error);
-  });
-},
-    
+      axios.post('http://localhost:8080/parking_occupant/api/AddVehicle.php',
+        JSON.stringify(vehicleData),
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      .then(response => {
+        if (response && response.data) {
+          if (response.data.success) {
+            console.log('Vehicle added successfully!', response.data);
+            alert('Vehicle added successfully');
+            this.vehicleType = '';
+            this.vehicleColor = '';
+            this.vehiclePlateNumber = '';
+            this.vehicleModel = '';
+            this.vehicleBrand = '';
+            this.showAddVehicleForm = false;
+            this.fetchOccupantVehicles();
+          } else {
+            console.error('Error adding vehicle:', response.data.error);
+          }
+        } else {
+          console.error('Error adding vehicle: undefined response');
+        }
+      })
+      .catch(error => {
+        console.error('Error adding vehicle:', error);
+      });
+    },
     async fetchOccupantVehicles() {
       try {
         this.loadingVehicles = true;
@@ -447,58 +436,70 @@ export default {
       }
     },
 
-    encryptData(data) {
-      try {
-        const iv = CryptoJS.lib.WordArray.random(16);
-        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), this.encryptionKey, {
-          iv: iv,
-          mode: CryptoJS.mode.CBC,
-          padding: CryptoJS.pad.Pkcs7
-        });
-        const ivBase64 = CryptoJS.enc.Base64.stringify(iv);
-        const encryptedBase64 = encrypted.toString();
-        return `${ivBase64}:${encryptedBase64}`;
-      } catch (error) {
-        console.error('Encryption error:', error);
-        return null;
-      }
-    },
-
+    
     generateQrCode() {
       const qrCodeData = {
         vehicleId: this.selectedVehicleId,
         occupantId: this.selectedOccupantId
       };
 
-      const encryptedData = this.encryptData(qrCodeData);
+      const encryptedData = encryptData(qrCodeData);
 
       if (encryptedData) {
-        QRCode.toDataURL(encryptedData)
-          .then(url => {
-            this.qrCodeUrl = url;
-            axios.post('http://localhost:8080/parking_occupant/api/SaveVehicleQrCode.php', {
-              occupantId: this.selectedOccupantId,
-              vehicleId: this.selectedVehicleId,
-              qrCode: url.split(',')[1]
-            })
-            .then(response => {
-              if (response.data.success) {
-                console.log('QR code saved successfully!');
-              } else {
-                console.error('Error saving QR code:', response.data.error);
-              }
-            })
-            .catch(error => {
-              console.error('Error saving QR code:', error);
-            });
-          })
-          .catch(err => {
+        // Generate QR code as a canvas element
+        QRCode.toCanvas(encryptedData, { width: 200 }, async (err, canvas) => {
+          if (err) {
             console.error('Error generating QR code:', err);
-          });
+            return;
+          }
+
+          // Fetch the logo from the server
+          const logoResponse = await axios.get('http://localhost:8080/parking_occupant/api/getLogo.php');
+          if (logoResponse.data && logoResponse.data.logoData) {
+            const logoDataUrl = `data:image/png;base64,${logoResponse.data.logoData}`;
+            const logoImg = new Image();
+
+            logoImg.onload = () => {
+              const ctx = canvas.getContext('2d');
+              const logoSize = canvas.width * 0.2; // 20% of QR code size
+              const logoX = (canvas.width - logoSize) / 2;
+              const logoY = (canvas.height - logoSize) / 2;
+
+              // Draw the logo at the center of the QR code
+              ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+
+              // Convert the canvas to a data URL and set it as the QR code URL
+              this.qrCodeUrl = canvas.toDataURL('image/png');
+
+              // Save the QR code to the server
+              axios.post('http://localhost:8080/parking_occupant/api/SaveVehicleQrCode.php', {
+                occupantId: this.selectedOccupantId,
+                vehicleId: this.selectedVehicleId,
+                qrCode: this.qrCodeUrl.split(',')[1] // Remove the data URL prefix
+              })
+              .then(response => {
+                if (response.data.success) {
+                  console.log('QR code saved successfully!');
+                } else {
+                  console.error('Error saving QR code:', response.data.error);
+                }
+              })
+              .catch(error => {
+                console.error('Error saving QR code:', error);
+              });
+            };
+
+            // Set the logo image source to the fetched data URL
+            logoImg.src = logoDataUrl;
+          } else {
+            console.error('Failed to fetch logo data');
+          }
+        });
       } else {
         console.error('Failed to encrypt data for QR code');
       }
     },
+
 
     showQRCodeModal(item) {
     this.selectedVehicleId = item.Vehicle_ID;

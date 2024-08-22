@@ -7,6 +7,7 @@ import RegistrationComponent from '../components/RegistrationComponent.vue';
 import ParkingLogComponent from '../components/ParkingLogComponent.vue';
 import SettingsComponent from '../components/SettingsComponent.vue';
 import RoleRegisterComponent from '@/components/RoleRegisterComponent.vue';
+import QRLogo from '@/components/QRLogo.vue'; // Import the QRLogo component
 import ViewActionOccupantComponent from '@/components/ViewActionOccupantComponent.vue';
 
 Vue.use(VueRouter);
@@ -61,6 +62,12 @@ const routes = [
         path: 'role-register',
         name: 'role-register',
         component: RoleRegisterComponent,
+        meta: { requiresAuth: true }, // Require authentication to access
+      },
+      {
+        path: 'qr-logo',
+        name: 'qr-logo',
+        component: QRLogo,
         meta: { requiresAuth: true }, // Require authentication to access
       },
     ],
