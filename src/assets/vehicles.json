@@ -1,0 +1,243 @@
+{
+    "vehicle_types": {
+      "Sedan": {
+        "Toyota": {
+          "models": ["Camry", "Corolla", "Vios", "Altis", "Yaris"]
+        },
+        "Honda": {
+          "models": ["Accord", "Civic", "City"]
+        },
+        "Hyundai": {
+          "models": ["Elantra", "Accent"]
+        },
+        "Mazda": {
+          "models": ["Mazda3"]
+        },
+        "Suzuki": {
+          "models": ["Ciaz", "Dzire"]
+        },
+        "Kia": {
+          "models": ["Pride GLX", "Rio", "Soluto"]
+        },
+        "Nissan": {
+          "models": ["Almera", "Sylphy"]
+        }
+      },
+      "MPV": {
+        "Toyota": {
+          "models": ["Innova", "Avanza", "Rush"]
+        },
+        "Mitsubishi": {
+          "models": ["Xpander", "Xpander Cross"]
+        },
+        "Suzuki": {
+          "models": ["Ertiga", "XL7"]
+        },
+        "Nissan": {
+          "models": ["Livina"]
+        },
+        "Hyundai": {
+          "models": ["Stargazer"]
+        },
+        "Foton": {
+          "models": ["Gratour", "Harabas TM 300"]
+        },
+        "Kia": {
+          "models": ["Carens"]
+        }
+      },
+      "AUV": {
+        "Mitsubishi": {
+          "models": ["Adventure"]
+        },
+        "Toyota": {
+          "models": ["Tamaraw FX", "Revo"]
+        },
+        "Isuzu": {
+          "models": ["Crosswind"]
+        }
+      },
+      "SUV": {
+        "Toyota": {
+          "models": ["Fortuner", "Rush", "Land Cruiser", "RAV4"]
+        },
+        "Honda": {
+          "models": ["CR-V", "HR-V", "BR-V"]
+        },
+        "Ford": {
+          "models": ["Everest", "Explorer", "EcoSport"]
+        },
+        "Mitsubishi": {
+          "models": ["Montero Sport", "Pajero"]
+        },
+        "Subaru": {
+          "models": ["Forester", "XV", "Outback"]
+        },
+        "Nissan": {
+          "models": ["Terra", "Patrol"]
+        }
+      },
+      "Hatchback": {
+        "Honda": {
+          "models": ["Jazz", "Brio", "Fit"]
+        },
+        "Kia": {
+          "models": ["Picanto", "Rio", "Pride CD-5"]
+        },
+        "Toyota": {
+          "models": ["Wigo", "Yaris"]
+        },
+        "Hyundai": {
+          "models": ["i10", "Accent Hatchback"]
+        },
+        "Suzuki": {
+          "models": ["Swift", "Celerio"]
+        },
+        "Mitsubishi": {
+          "models": ["Mirage"]
+        }
+      },
+      "Convertible": {
+        "BMW": {
+          "models": ["Z4"]
+        },
+        "Mazda": {
+          "models": ["MX-5"]
+        },
+        "Mini": {
+          "models": ["Cooper Convertible"]
+        },
+        "Ford": {
+          "models": ["Mustang Convertible"]
+        }
+      },
+      "Coupe": {
+        "Ford": {
+          "models": ["Mustang"]
+        },
+        "Audi": {
+          "models": ["TT"]
+        },
+        "Chevrolet": {
+          "models": ["Camaro"]
+        },
+        "Toyota": {
+          "models": ["86"]
+        }
+      },
+      "Pickup Truck": {
+        "Toyota": {
+          "models": ["Hilux"]
+        },
+        "Ford": {
+          "models": ["Ranger", "F-150", "Raptor"]
+        },
+        "Nissan": {
+          "models": ["Navara"]
+        },
+        "Isuzu": {
+          "models": ["D-Max"]
+        },
+        "Mitsubishi": {
+          "models": ["Strada"]
+        },
+        "Chevrolet": {
+          "models": ["Colorado"]
+        }
+      },
+      "Van": {
+        "Nissan": {
+          "models": ["Urvan", "NV350"]
+        },
+        "Hyundai": {
+          "models": ["Starex", "H-100"]
+        },
+        "Toyota": {
+          "models": ["Hiace"]
+        },
+        "Foton": {
+          "models": ["Toano"]
+        },
+        "Mitsubishi": {
+          "models": ["L300"]
+        },
+        "Isuzu": {
+          "models": ["Travis"]
+        }
+      },
+      "Minivan": {
+        "Honda": {
+          "models": ["Odyssey"]
+        },
+        "Kia": {
+          "models": ["Carnival"]
+        },
+        "Toyota": {
+          "models": ["Sienna", "Alphard"]
+        }
+      },
+      "Motorcycle": {
+        "Yamaha": {
+          "models": ["NMAX", "YTX 125", "Mio"]
+        },
+        "Suzuki": {
+          "models": ["Raider R150", "Skydrive Sport", "Gixxer"]
+        },
+        "Honda": {
+          "models": ["Click 125i", "XRM 125", "XL 100", "XR 150L", "CBR150R"]
+        },
+        "Kawasaki": {
+          "models": ["Rouser", "Barako II"]
+        }
+      },
+      "Scooter": {
+        "Vespa": {
+          "models": ["Primavera", "Sprint"]
+        },
+        "Honda": {
+          "models": ["Click 125i", "Beat", "ADV150"]
+        },
+        "Yamaha": {
+          "models": ["Mio Aerox", "Mio Soul i125", "NMAX"]
+        }
+      },
+      "Electric Vehicle": {
+        "Tesla": {
+          "models": ["Model 3", "Model S", "Cybertruck", "Model Y"]
+        },
+        "Nissan": {
+          "models": ["Leaf"]
+        },
+        "Ford": {
+          "models": ["Mach-E"]
+        },
+        "Subaru": {
+          "models": ["Solterra"]
+        },
+        "Cadillac": {
+          "models": ["LYRIQ"]
+        },
+        "Mercedes-Benz": {
+          "models": ["EQB"]
+        },
+        "BYD": {
+          "models": ["Tang", "Han"]
+        }
+      },
+      "Electric Scooter": {
+        "Niu": {
+          "models": ["M+ Sport", "NGT"]
+        },
+        "Kymco": {
+          "models": ["Like 125 EV"]
+        },
+        "Segway": {
+          "models": ["Ninebot Max G30"]
+        },
+        "Gogoro": {
+          "models": ["S2", "Viva"]
+        }
+      }
+    }
+  }
+  

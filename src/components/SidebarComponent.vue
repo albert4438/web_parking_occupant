@@ -3,19 +3,24 @@
     <!-- User Information Section -->
     <v-list-item class="user-info">
       <v-list-item-avatar>
-        <v-icon x-large>mdi-account-circle</v-icon>
+        <!-- Display profile picture or default icon -->
+        <v-img :src="getProfilePicture(profilePicture)" v-if="profilePicture" aspect-ratio="1" class="profile-picture" />
+        <v-icon v-else x-large>mdi-account</v-icon>
       </v-list-item-avatar>
+
       <v-list-item-content>
-        <v-list-item-title class="text-capitalize">{{ username }}</v-list-item-title>
-        <v-list-item-subtitle class="subtitle">You're logged in as {{ jobTitle }}</v-list-item-subtitle>
+        <v-list-item-title class="text-capitalize">{{ firstname }}</v-list-item-title>
+        <v-list-item-subtitle class="subtitle">{{ jobTitle }}</v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
 
     <!-- Main Navigation Items -->
     <v-list>
       <v-list-item-group v-model="selectedItem" color="grey lighten-4">
+
+        <!-- Use computed property to filter items -->
         <v-list-item
-          v-for="(item, i) in items"
+          v-for="(item, i) in filteredItems"
           :key="i"
           @click="handleItemClick(i, item)"
           :class="{ 'active-item': i === selectedItem }">
@@ -52,7 +57,7 @@
     </v-list>
 
     <!-- Logout Button at the Bottom -->
-    <div style="position: absolute; bottom: 0; width: 100%; padding: 10px;">
+    <div class="logout-btn">
       <v-btn color="#ffbd2e" dark block tile @click="logout">LOGOUT</v-btn>
     </div>
   </v-navigation-drawer>
@@ -75,19 +80,27 @@ export default {
         { icon: 'mdi-account-group', text: 'ROLES', route: '/dashboard/role-register' },
         { icon: 'mdi-qrcode', text: 'QR Logo', route: '/dashboard/qr-logo' },
       ],
-      username: '',
-      jobTitle: ''
+      jobTitle: '',
+      firstname: '', // Initialize firstname
+      profilePicture: '' // Initialize profilePicture
     };
   },
 
   created() {
-    this.username = localStorage.getItem('username') || 'Guest';
+    this.firstname = localStorage.getItem('firstname') || 'Guest';
+    this.profilePicture = localStorage.getItem('profilePicture') || '';
     this.jobTitle = localStorage.getItem('jobTitle') || 'No Title';
   },
 
   computed: {
     isSettingsSelected() {
       return this.selectedItem === this.settingsIndex;
+    },
+    // Computed property to filter items
+    filteredItems() {
+      return this.items.filter(item => {
+        return !(item.text === 'SETTINGS' && ['Security Officer', 'Guard', 'Watchman'].includes(this.jobTitle));
+      });
     }
   },
 
@@ -145,9 +158,18 @@ export default {
     },
     logout() {
       localStorage.removeItem('token');
-      localStorage.removeItem('username');
+      localStorage.removeItem('firstname');
+      localStorage.removeItem('profilePicture');
       localStorage.removeItem('jobTitle');
+      localStorage.removeItem('role');
       this.$router.push('/');
+    },
+    getProfilePicture(profilePicture) {
+      // Check if profilePicture is already a complete URL or base64 string, adjust if necessary
+      if (!profilePicture.startsWith('data:image')) {
+        return `data:image/jpeg;base64,${profilePicture}`;
+      }
+      return profilePicture;
     }
   }
 };
@@ -180,5 +202,11 @@ export default {
 
 .v-list-item {
   cursor: pointer;
+}
+
+/* Add this style for the profile picture */
+.profile-picture {
+  border-radius: 50%;
+  object-fit: cover;
 }
 </style>

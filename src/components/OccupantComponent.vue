@@ -7,7 +7,9 @@
     </v-text-field>
     
     <!-- Button to open modal -->
-    <v-btn color="primary" class="mb-4" @click="addOccupant">ADD OCCUPANT</v-btn>
+    <!-- <v-btn color="primary" class="mb-4" @click="addOccupant">ADD OCCUPANT</v-btn> -->
+    <v-btn color="primary" class="mb-4" v-if="canAddOccupant" @click="addOccupant">ADD OCCUPANT</v-btn>
+
     
     <!-- Occupant list -->
     <v-list>
@@ -63,7 +65,10 @@ export default {
           (occupant.Lastname && occupant.Lastname.toLowerCase().includes(this.search.toLowerCase())) 
         );
       });
-    }
+    },
+    canAddOccupant() {
+    return ['Admin', 'Manager', 'Supervisor', 'Coordinator'].includes(localStorage.getItem('jobTitle'));
+  }
   },
   methods: {
     fetchOccupants() {

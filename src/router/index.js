@@ -36,7 +36,6 @@ const routes = [
         path: 'occupant/view-action-occupant/:id',
         name: 'view-action-occupant',
         component: ViewActionOccupantComponent,
-        //component: () => import('../components/ViewActionOccupantComponent.vue'),
         meta: { requiresAuth: true }, // Require authentication to access
         props: route => ({ occupantId: Number(route.params.id) })
       },
@@ -85,16 +84,27 @@ const router = new VueRouter({
   routes,
 });
 
-// Navigation guard to check authentication status
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('token'); // Assuming token is stored in localStorage
+// // Navigation guard to check authentication status and job title restrictions
+// router.beforeEach((to, from, next) => {
+//   if (typeof localStorage !== 'undefined') {
+//     const isAuthenticated = localStorage.getItem('token'); // Ensure localStorage is defined
+//     const jobTitle = localStorage.getItem('jobTitle');
 
-  // Check if the route requires authentication and user is not authenticated
-  if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-    next({ path: '/' }); // Redirect to login page if not authenticated
-  } else {
-    next(); // Proceed to the next route
-  }
-});
+//     // Authentication and job title checks
+//     if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
+//       next({ path: '/' });
+//     } else if (
+//       ['Security Officer', 'Guard', 'Watchman'].includes(jobTitle) &&
+//       ['/dashboard/settings', '/dashboard/registration', '/dashboard/qr-logo', '/dashboard/role-register'].includes(to.path)
+//     ) {
+//       next('/dashboard');
+//     } else {
+//       next();
+//     }
+//   } else {
+//     next(); // Proceed if localStorage is not available (in non-browser environments)
+//   }
+// });
+
 
 export default router;
