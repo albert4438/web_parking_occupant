@@ -2,9 +2,9 @@
   <div>
     <!-- Filter and Search Panel -->
     <v-card class="mb-4 pa-4">
-      <v-row>
-        <!-- Keyword Search -->
-        <v-col cols="12" md="4">
+      <v-row dense>
+        <!-- Row 1: Keyword Search, Action Type, Date Range, Sort By -->
+        <v-col cols="12" md="3">
           <v-text-field 
             v-model="search" 
             label="Search by keyword" 
@@ -15,8 +15,7 @@
           ></v-text-field>
         </v-col>
 
-        <!-- Action Type Filter -->
-        <v-col cols="12" md="4">
+        <v-col cols="12" md="3">
           <v-select
             v-model="actionType"
             :items="['All', 'ENTRY', 'EXIT']"
@@ -28,8 +27,7 @@
           ></v-select>
         </v-col>
 
-        <!-- Date Range Filter -->
-        <v-col cols="12" md="4">
+        <v-col cols="12" md="3">
           <v-menu
             v-model="menu"
             :close-on-content-click="false"
@@ -59,8 +57,7 @@
           </v-menu>
         </v-col>
 
-        <!-- Sorting Options -->
-        <v-col cols="12" md="4">
+        <v-col cols="12" md="3">
           <v-select
             v-model="sortOption"
             :items="['Date: Latest First', 'Date: Oldest First']"
@@ -69,6 +66,47 @@
             clearable
             prepend-inner-icon="mdi-sort"
             @change="applyFilters"
+          ></v-select>
+        </v-col>
+      </v-row>
+
+      <v-row dense>
+        <!-- Row 2: Vehicle Type, Vehicle Brand, Vehicle Model -->
+        <v-col cols="12" md="4">
+          <v-select
+            v-model="vehicleType"
+            :items="vehicleTypes"
+            label="Filter by vehicle type"
+            solo
+            clearable
+            prepend-inner-icon="mdi-car"
+            @change="onVehicleTypeChange"
+          ></v-select>
+        </v-col>
+
+        <v-col cols="12" md="4">
+          <v-select
+            v-model="vehicleBrand"
+            :items="vehicleBrands"
+            label="Filter by vehicle brand"
+            solo
+            clearable
+            prepend-inner-icon="mdi-car"
+            @change="onVehicleBrandChange"
+            :disabled="!vehicleType"
+          ></v-select>
+        </v-col>
+
+        <v-col cols="12" md="4">
+          <v-select
+            v-model="vehicleModel"
+            :items="vehicleModels"
+            label="Filter by vehicle model"
+            solo
+            clearable
+            prepend-inner-icon="mdi-car"
+            @change="applyFilters"
+            :disabled="!vehicleBrand"
           ></v-select>
         </v-col>
       </v-row>
@@ -97,7 +135,7 @@
       <v-simple-table dense class="elevated">
         <thead>
           <tr>
-            <th class="sticky-header text-left">Personnel</th>
+            <th class="sticky-header text-left">Scanned by</th>
             <th class="sticky-header text-left">Vehicle</th>
             <th class="sticky-header text-left">Occupant</th>
             <th class="sticky-header text-left">Action</th>
@@ -110,14 +148,13 @@
             <td>{{ log.personnel_fullname }}</td>
             <td>{{ log.vehicle }}</td>
             <td>{{ log.occupant_fullname }}</td>
+
             <td>
-              <v-icon :color="log.action_type === 'ENTRY' ? 'green' : 'red'">
-                {{ log.action_type === 'ENTRY' ? 'mdi-arrow-right' : 'mdi-arrow-left' }}
-              </v-icon>
               <v-chip :color="log.action_type === 'ENTRY' ? 'green' : 'red'" text-color="white" small>
                 {{ log.action_type }}
               </v-chip>
             </td>
+
             <td>{{ new Date(log.timestamp).toLocaleString() }}</td>
             <td class="text-center">
               <v-btn icon v-if="canDeleteLog" @click="deleteLog(log.log_id)">
@@ -158,21 +195,30 @@
   </div>
 </template>
 
+
 <script>
+import vehicleInfos from '@/assets/vehicles.json';
+
 export default {
   name: 'ParkingLogComponent',
   data() {
     return {
-      parkingLogs: [],
-      search: '',
-      actionType: 'All',
-      dateRange: [],
-      menu: false,
-      dateRangeText: '',
-      sortOption: 'Date: Latest First',  // Default sorting option
-      page: 1,
-      perPage: 7,  // Set default rows per page to 10
-      activeFilters: [],
+    parkingLogs: [],
+    search: '',
+    actionType: 'All',
+    vehicleType: null,
+    vehicleBrand: null,
+    vehicleModel: null,
+    vehicleTypes: Object.keys(vehicleInfos.vehicle_types),
+    vehicleBrands: [],
+    vehicleModels: [],
+    dateRange: [],
+    menu: false,
+    dateRangeText: '',
+    sortOption: 'Date: Latest First',
+    page: 1,
+    perPage: 7,
+    activeFilters: [],
     };
   },
   computed: {
@@ -186,11 +232,15 @@ export default {
         const matchesActionType = 
           this.actionType === 'All' || log.action_type === this.actionType;
 
+        const matchesVehicleType = !this.vehicleType || log.vehicle_type === this.vehicleType;
+        const matchesVehicleBrand = !this.vehicleBrand || log.vehicle_brand === this.vehicleBrand;
+        const matchesVehicleModel = !this.vehicleModel || log.vehicle_model === this.vehicleModel;
+
         const matchesDateRange = !this.dateRange.length ||
           (new Date(log.timestamp) >= new Date(this.dateRange[0]) &&
-           new Date(log.timestamp) <= new Date(this.dateRange[1]));
+          new Date(log.timestamp) <= new Date(this.dateRange[1]));
 
-        return matchesSearch && matchesActionType && matchesDateRange;
+        return matchesSearch && matchesActionType && matchesVehicleType && matchesVehicleBrand && matchesVehicleModel && matchesDateRange;
       });
 
       // Apply sorting based on the selected option
@@ -216,8 +266,17 @@ export default {
   },
   methods: {
     async fetchLogs() {
+      const params = new URLSearchParams({
+        actionType: this.actionType,
+        vehicleType: this.vehicleType || '',
+        vehicleBrand: this.vehicleBrand || '',
+        vehicleModel: this.vehicleModel || '',
+        startDate: this.dateRange[0] ? new Date(this.dateRange[0]).toISOString() : '',
+        endDate: this.dateRange[1] ? new Date(this.dateRange[1]).toISOString() : ''
+      });
+
       try {
-        const response = await fetch('http://localhost:8080/parking_occupant/api/fetchParkingLogs.php');
+        const response = await fetch(`http://localhost:8080/parking_occupant/api/fetchParkingLogs.php?${params.toString()}`);
         const data = await response.json();
 
         if (data.success) {
@@ -229,29 +288,13 @@ export default {
         console.error('Error fetching parking logs:', error);
       }
     },
-    applyFilters() {
-      this.page = 1;
-      this.dateRangeText = this.dateRange.length ? 
-        `${new Date(this.dateRange[0]).toLocaleDateString()} - ${new Date(this.dateRange[1]).toLocaleDateString()}` : '';
 
-      // Update active filters
-      this.activeFilters = [];
-      if (this.search) {
-        this.activeFilters.push({ label: `Keyword: ${this.search}`, type: 'search' });
-      }
-      if (this.actionType !== 'All') {
-        this.activeFilters.push({ label: `Action: ${this.actionType}`, type: 'actionType' });
-      }
-      if (this.dateRangeText) {
-        this.activeFilters.push({ label: `Date Range: ${this.dateRangeText}`, type: 'dateRange' });
-      }
-      if (this.sortOption) {
-        this.activeFilters.push({ label: `Sort: ${this.sortOption}`, type: 'sortOption' });
-      }
-    },
     resetFilters() {
       this.search = '';
       this.actionType = 'All';
+      this.vehicleType = '';
+      this.vehicleBrand = '';
+      this.vehicleModel = '';
       this.dateRange = [];
       this.dateRangeText = '';
       this.sortOption = 'Date: Latest First';  // Reset to default sorting option
@@ -289,6 +332,49 @@ export default {
     changePage(page) {
       this.page = page;
     },
+
+    onVehicleTypeChange() {
+    this.vehicleBrand = null;
+    this.vehicleModel = null;
+    this.vehicleBrands = this.vehicleType ? Object.keys(vehicleInfos.vehicle_types[this.vehicleType]) : [];
+    this.vehicleModels = [];
+    this.applyFilters();
+  },
+  onVehicleBrandChange() {
+    this.vehicleModel = null;
+    this.vehicleModels = this.vehicleBrand ? vehicleInfos.vehicle_types[this.vehicleType][this.vehicleBrand].models : [];
+    this.applyFilters();
+  },
+  applyFilters() {
+    this.page = 1;
+    this.dateRangeText = this.dateRange.length ? 
+      `${new Date(this.dateRange[0]).toLocaleDateString()} - ${new Date(this.dateRange[1]).toLocaleDateString()}` : '';
+
+    this.activeFilters = [];
+
+    if (this.search) {
+      this.activeFilters.push({ label: `Keyword: ${this.search}`, type: 'search' });
+    }
+    if (this.actionType !== 'All') {
+      this.activeFilters.push({ label: `Action: ${this.actionType}`, type: 'actionType' });
+    }
+    if (this.vehicleType) {
+      this.activeFilters.push({ label: `Vehicle Type: ${this.vehicleType}`, type: 'vehicleType' });
+    }
+    if (this.vehicleBrand) {
+      this.activeFilters.push({ label: `Vehicle Brand: ${this.vehicleBrand}`, type: 'vehicleBrand' });
+    }
+    if (this.vehicleModel) {
+      this.activeFilters.push({ label: `Vehicle Model: ${this.vehicleModel}`, type: 'vehicleModel' });
+    }
+    if (this.dateRangeText) {
+      this.activeFilters.push({ label: `Date Range: ${this.dateRangeText}`, type: 'dateRange' });
+    }
+    if (this.sortOption) {
+      this.activeFilters.push({ label: `Sort: ${this.sortOption}`, type: 'sortOption' });
+    }
+  },
+    
   },
   mounted() {
     this.fetchLogs();

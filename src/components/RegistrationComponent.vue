@@ -35,8 +35,20 @@
                 <v-text-field v-model="formData.birthdate" label="Birthdate" type="date" required :rules="[v => !!v || 'Required']" outlined></v-text-field>
               </v-col>
               <v-col cols="12" sm="4">
-                <v-text-field v-model="formData.phonenumber" label="Phone Number" required :rules="[v => !!v || 'Phone Number is required']" outlined></v-text-field>
+                <v-text-field
+                  v-model="formData.phonenumber"
+                  label="Phone Number"
+                  required
+                  type="number"
+                  :rules="[
+                    v => !!v || 'Phone Number is required',
+                    v => /^[0-9]+$/.test(v) || 'Phone Number must be an integer'
+                  ]"
+                  outlined
+                  @input="validateInteger"
+                ></v-text-field>
               </v-col>
+
               <v-col cols="12" sm="4">
                 <v-select
                   v-model="formData.region"
@@ -566,7 +578,16 @@ export default {
       this.resetFormData();
       this.formData.role = 'Student';
       this.showAdditionalFields = false;
-    }
+    },
+
+    validateInteger(event) {
+      const value = event.target.value;
+      // Remove non-numeric characters
+      if (value !== '' && !/^[0-9]+$/.test(value)) {
+        event.target.value = value.replace(/[^\d]/g, '');
+        this.formData.phonenumber = event.target.value;
+      }
+    },
 
   },
 };

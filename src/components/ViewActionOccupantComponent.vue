@@ -143,14 +143,14 @@
     </v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="primary" @click="addVehicle">Add</v-btn>
-      <v-btn color="error" @click="showAddVehicleForm = false">Cancel</v-btn>
+      <v-btn color="primary" :disabled="!isFormValid" @click="addVehicle">Save</v-btn>
+      <v-btn color="error" @click="resetForm(); showAddVehicleForm = false">Cancel</v-btn>
     </v-card-actions>
   </v-card>
 </v-dialog>
 
 
-<v-dialog v-model="QRCODEModal" max-width="400px">
+<v-dialog v-model="QRCODEModal" max-width="500px">
   <v-card>
     <v-card-title class="headline">QR Code</v-card-title>
     <v-card-text>
@@ -159,7 +159,7 @@
           <!-- QR Code Column -->
           <v-col cols="12" md="6" class="d-flex justify-center">
             <div v-if="qrCodeUrl">
-              <img :src="qrCodeUrl" alt="QR Code" />
+              <img :src="qrCodeUrl" alt="QR Code" id="qrcode-to-print" />
             </div>
             <div v-else class="text-center">
               <p>No QR code available. Please click the 'Generate' button below.</p>
@@ -207,10 +207,15 @@
     </v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
+      <!-- Print Button -->
+      <v-btn color="secondary" @click="printQRCode">
+        <v-icon left>mdi-printer</v-icon> Print QR Code
+      </v-btn>
       <v-btn color="blue darken-1" text @click="QRCODEModal = false">Close</v-btn>
     </v-card-actions>
   </v-card>
 </v-dialog>
+
 
 
     <v-dialog v-model="editModal" max-width="700px">
@@ -366,6 +371,9 @@ export default {
     canEditProfile() {
       return ['Admin', 'Manager', 'Supervisor', 'Coordinator'].includes(localStorage.getItem('jobTitle'));
     },
+    isFormValid() {
+      return this.selectedVehicleType && this.selectedVehicleBrand && this.vehicleModel && this.vehicleColor && this.vehiclePlateNumber;
+    }
     
   },
   mounted() {
@@ -494,11 +502,7 @@ export default {
           if (response.data.success) {
             console.log('Vehicle added successfully!', response.data);
             alert('Vehicle added successfully');
-            this.vehicleType = '';
-            this.vehicleColor = '';
-            this.vehiclePlateNumber = '';
-            this.vehicleModel = '';
-            this.vehicleBrand = '';
+            this.resetForm();
             this.showAddVehicleForm = false;
             this.fetchOccupantVehicles();
           } else {
@@ -612,8 +616,47 @@ export default {
           console.error('Error fetching QR code:', error);
           this.QRCODEModal = true;
         });
-    }
+    },
 
+    printQRCode() {
+      const qrCodeElement = document.getElementById('qrcode-to-print');
+      
+      if (qrCodeElement) {
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+
+        const doc = iframe.contentWindow || iframe.contentDocument;
+        const iframeDocument = doc.document || doc;
+        
+        iframeDocument.write('<html><head><title>Print QR Code</title></head><body>');
+        iframeDocument.write('<div style="text-align: center;">');
+        iframeDocument.write(qrCodeElement.outerHTML);  // Clone the QR code element
+        iframeDocument.write('</div>');
+        iframeDocument.write('</body></html>');
+        iframeDocument.close();
+
+        // Print the iframe content
+        doc.focus();
+        doc.print();
+
+        // Remove the iframe after printing
+        document.body.removeChild(iframe);
+      } else {
+        console.error("No QR code to print.");
+      }
+    },
+
+    resetForm() {
+      this.selectedVehicleType = '';
+      this.selectedVehicleBrand = '';
+      this.vehicleModel = '';
+      this.vehicleColor = '';
+      this.vehiclePlateNumber = '';
+    },
 
 
   },
