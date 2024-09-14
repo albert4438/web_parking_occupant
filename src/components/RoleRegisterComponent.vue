@@ -43,16 +43,11 @@
           <thead>
             <tr>
               <th class="text-left">Role Name</th>
-              <th class="text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(role, index) in roles" :key="index">
               <td>{{ role }}</td>
-              <td>
-                <v-icon small @click="editRole(index)">mdi-pencil</v-icon>
-                <v-icon small @click="deleteRole(role.Role_ID)">mdi-delete</v-icon> <!-- Corrected here -->
-              </td>
             </tr>
           </tbody>
         </template>

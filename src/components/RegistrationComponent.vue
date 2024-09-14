@@ -45,9 +45,12 @@
                     v => /^[0-9]+$/.test(v) || 'Phone Number must be an integer'
                   ]"
                   outlined
-                  @input="validateInteger"
+                  @keydown="restrictKeydown"
+                  @input="restrictInput"
                 ></v-text-field>
               </v-col>
+
+
 
               <v-col cols="12" sm="4">
                 <v-select
@@ -285,14 +288,6 @@ export default {
   },
 
   methods: {
-
-    loadRegions() {
-      this.regions = Object.keys(addressData).map(regionKey => ({
-        region_slug: regionKey.toLowerCase().replace(/ /g, '-'),
-        region_name: addressData[regionKey].region_name,
-      }));
-    },
-
     loadProvinces() {
       const selectedRegion = this.regions.find(r => r.region_slug === this.formData.region);
       if (!selectedRegion) return;
@@ -389,51 +384,51 @@ export default {
     },
 
     async handleSubmit() {
-  if (this.$refs.form.validate()) {
-    this.isSubmitting = true;
+      if (this.$refs.form.validate()) {
+        this.isSubmitting = true;
 
-    let base64Image = null;
-    if (this.formData.image) {
-      base64Image = await this.convertImageToBase64(this.formData.image);
-    }
+        let base64Image = null;
+        if (this.formData.image) {
+          base64Image = await this.convertImageToBase64(this.formData.image);
+        }
 
-    // Fetch region name and convert to uppercase
-    const selectedRegion = this.regions.find(r => r.region_slug === this.formData.region);
-    const regionName = selectedRegion ? selectedRegion.region_name.toUpperCase() : ''; // Convert region name to uppercase
+        // Fetch region name and convert to uppercase
+        const selectedRegion = this.regions.find(r => r.region_slug === this.formData.region);
+        const regionName = selectedRegion ? selectedRegion.region_name.toUpperCase() : ''; // Convert region name to uppercase
 
-    // Create the full address and format it
-    const fullAddress = `${regionName}, ${this.formData.province}, ${this.formData.municipality}, ${this.formData.barangay}`;
-    const formattedAddress = this.formatAddress(fullAddress);
+        // Create the full address and format it
+        const fullAddress = `${regionName}, ${this.formData.province}, ${this.formData.municipality}, ${this.formData.barangay}`;
+        const formattedAddress = this.formatAddress(fullAddress);
 
-    const payload = {
-      ...this.formData,
-      region_name: regionName, // Send uppercase region name
-      address: formattedAddress,
-      image: base64Image
-    };
+        const payload = {
+          ...this.formData,
+          region_name: regionName, // Send uppercase region name
+          address: formattedAddress,
+          image: base64Image
+        };
 
-    axios
-      .post('http://localhost:8080/parking_occupant/api/registerOccupant.php', payload, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .then((response) => {
-        console.log('Registration successful:', response.data);
-        alert('Registration successful');
-        this.$emit('refreshList');
-        this.dialog = false;
-        this.resetFormData();
-      })
-      .catch((error) => {
-        console.error('Registration failed:', error.response ? error.response.data : error.message);
-        alert('Registration failed: ' + (error.response ? error.response.data.error : error.message));
-      })
-      .finally(() => {
-        this.isSubmitting = false;
-      });
-  }
-},
+        axios
+          .post('http://localhost:8080/parking_occupant/api/registerOccupant.php', payload, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+          .then((response) => {
+            console.log('Registration successful:', response.data);
+            alert('Registration successful');
+            this.$emit('refreshList');
+            this.dialog = false;
+            this.resetFormData();
+          })
+          .catch((error) => {
+            console.error('Registration failed:', error.response ? error.response.data : error.message);
+            alert('Registration failed: ' + (error.response ? error.response.data.error : error.message));
+          })
+          .finally(() => {
+            this.isSubmitting = false;
+          });
+      }
+    },
 
     handleRoleChange() {
       if (this.formData.role === 'Administrator') {
@@ -587,6 +582,33 @@ export default {
         event.target.value = value.replace(/[^\d]/g, '');
         this.formData.phonenumber = event.target.value;
       }
+    },
+    
+    restrictInput(event) {
+      const input = event.target.value;
+      // Check if input length is greater than 11
+      if (input.length > 11) {
+        event.target.value = input.slice(0, 11);  // Restrict to first 11 digits
+        this.formData.phonenumber = input.slice(0, 11);  // Update v-model
+      }
+    },
+    
+    restrictKeydown(event) {
+      const input = this.formData.phonenumber || '';
+      
+      // Allow navigation keys (arrows, backspace, delete)
+      const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight'];
+      
+      if (input.length >= 11 && !allowedKeys.includes(event.key)) {
+        event.preventDefault();  // Block any further input if length is 11
+      }
+    },
+
+    loadRegions() {
+      this.regions = Object.keys(addressData).map(regionKey => ({
+        region_slug: regionKey.toLowerCase().replace(/ /g, '-'),
+        region_name: addressData[regionKey].region_name,
+      }));
     },
 
   },

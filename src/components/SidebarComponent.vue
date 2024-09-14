@@ -17,7 +17,6 @@
     <!-- Main Navigation Items -->
     <v-list>
       <v-list-item-group v-model="selectedItem" color="grey lighten-4">
-
         <!-- Use computed property to filter items -->
         <v-list-item
           v-for="(item, i) in filteredItems"
@@ -78,7 +77,8 @@ export default {
       ],
       settingsSubItems: [
         { icon: 'mdi-account-group', text: 'ROLES', route: '/dashboard/role-register' },
-        { icon: 'mdi-qrcode', text: 'QR Logo', route: '/dashboard/qr-logo' },
+        { icon: 'mdi-qrcode', text: 'QR LOGO', route: '/dashboard/qr-logo' },
+        { icon: 'mdi-directions', text: 'PARKING LOT', route: '/dashboard/parking-lot' }, // New Parking Lot submenu item
       ],
       jobTitle: '',
       firstname: '', // Initialize firstname

@@ -1,9 +1,13 @@
 <template>
   <div>
-    <v-text-field v-model="search" label="Search" solo hide-details class="mb-4">
-      <v-btn slot="append" icon @click="searchOccupants">
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
+    <v-text-field 
+    v-model="search" 
+    label="Search Occupant" 
+    outlined
+    hide-details 
+    prepend-inner-icon="mdi-magnify"
+    class="mb-4">
+    
     </v-text-field>
     
     <!-- Button to open modal -->

@@ -7,8 +7,7 @@ import RegistrationComponent from '../components/RegistrationComponent.vue';
 import ParkingLogComponent from '../components/ParkingLogComponent.vue';
 import SettingsComponent from '../components/SettingsComponent.vue';
 import RoleRegisterComponent from '@/components/RoleRegisterComponent.vue';
-import QRLogo from '@/components/QRLogo.vue';
-import ParkingLotComponent from '@/components/ParkingLotComponent.vue'; // Import the new Parking Lot component
+import QRLogo from '@/components/QRLogo.vue'; // Import the QRLogo component
 import ViewActionOccupantComponent from '@/components/ViewActionOccupantComponent.vue';
 
 Vue.use(VueRouter);
@@ -31,49 +30,43 @@ const routes = [
         path: 'occupant',
         name: 'occupant',
         component: OccupantComponent,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true }, // Require authentication to access
       },
       {
         path: 'occupant/view-action-occupant/:id',
         name: 'view-action-occupant',
         component: ViewActionOccupantComponent,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true }, // Require authentication to access
         props: route => ({ occupantId: Number(route.params.id) })
       },
       {
         path: 'registration',
         name: 'registration',
         component: RegistrationComponent,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true }, // Require authentication to access
       },
       {
         path: 'parking-log',
         name: 'parking-log',
         component: ParkingLogComponent,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true }, // Require authentication to access
       },
       {
         path: 'settings',
         name: 'settings',
         component: SettingsComponent,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true }, // Require authentication to access
       },
       {
         path: 'role-register',
         name: 'role-register',
         component: RoleRegisterComponent,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true }, // Require authentication to access
       },
       {
         path: 'qr-logo',
         name: 'qr-logo',
         component: QRLogo,
-        meta: { requiresAuth: true },
-      },
-      {
-        path: 'parking-lot',
-        name: 'parking-lot',
-        component: ParkingLotComponent,
         meta: { requiresAuth: true }, // Require authentication to access
       },
     ],
@@ -90,5 +83,28 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 });
+
+// // Navigation guard to check authentication status and job title restrictions
+// router.beforeEach((to, from, next) => {
+//   if (typeof localStorage !== 'undefined') {
+//     const isAuthenticated = localStorage.getItem('token'); // Ensure localStorage is defined
+//     const jobTitle = localStorage.getItem('jobTitle');
+
+//     // Authentication and job title checks
+//     if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
+//       next({ path: '/' });
+//     } else if (
+//       ['Security Officer', 'Guard', 'Watchman'].includes(jobTitle) &&
+//       ['/dashboard/settings', '/dashboard/registration', '/dashboard/qr-logo', '/dashboard/role-register'].includes(to.path)
+//     ) {
+//       next('/dashboard');
+//     } else {
+//       next();
+//     }
+//   } else {
+//     next(); // Proceed if localStorage is not available (in non-browser environments)
+//   }
+// });
+
 
 export default router;
