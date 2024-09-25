@@ -123,6 +123,7 @@ export default {
         this.error = 'Failed to communicate with API';
       }
     },
+    
   },
 };
 </script>

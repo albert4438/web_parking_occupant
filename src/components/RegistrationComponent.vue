@@ -1,9 +1,16 @@
 <template>
-  <v-dialog v-model="dialog" max-width="2000px">
+
+  <!-- card for the registration form which will be called in the dashboard button 'Add Occupant' -->
+  <v-dialog v-model="dialog" max-width="2000px" persistent>
+   
+    <!-- Content of the registration form -->
     <v-card>
-      <v-card-title class="headline primary--text">
-        <v-icon left class="mr-2">mdi-account-plus</v-icon> Add Occupant
+      <!-- Add occupant button -->
+      <v-card-title class="primary darken-1 white--text" style="margin-bottom: 20px;">
+        <v-icon left class="mr-2" style="color: white">mdi-account-plus</v-icon> Add Occupant
       </v-card-title>
+
+      <!-- Registration fields and etc -->
       <v-card-text>
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-container>
@@ -32,8 +39,29 @@
 
               <!-- Second Row -->
               <v-col cols="12" sm="4">
-                <v-text-field v-model="formData.birthdate" label="Birthdate" type="date" required :rules="[v => !!v || 'Required']" outlined></v-text-field>
+                <v-text-field
+                  v-model="formData.birthdate"
+                  label="Birthdate"
+                  type="date"
+                  required
+                  :rules="[
+                    v => !!v || 'Required',
+                    v => {
+                      const birthdate = new Date(v);
+                      const age = Math.floor((new Date() - birthdate) / 31536000000); // 31536000000 is the number of milliseconds in a year
+                      if (age < 18) {
+                        return 'Must be at least 18 years old';
+                      } else if (age > 75) {
+                        return 'Must be 75 years old or younger';
+                      } else {
+                        return true;
+                      }
+                    }
+                  ]"
+                  outlined
+                />
               </v-col>
+              
               <v-col cols="12" sm="4">
                 <v-text-field
                   v-model="formData.phonenumber"
@@ -49,8 +77,6 @@
                   @input="restrictInput"
                 ></v-text-field>
               </v-col>
-
-
 
               <v-col cols="12" sm="4">
                 <v-select
@@ -78,6 +104,7 @@
                   required
                   :rules="[v => !!v || 'Required']"
                   outlined
+                  :disabled="!formData.region"
                 ></v-select>
               </v-col>
               <v-col cols="12" sm="4">
@@ -91,6 +118,7 @@
                   required
                   :rules="[v => !!v || 'Required']"
                   outlined
+                  :disabled="!formData.province"
                 ></v-select>
               </v-col>
               <v-col cols="12" sm="4">
@@ -103,6 +131,7 @@
                   required
                   :rules="[v => !!v || 'Required']"
                   outlined
+                  :disabled="!formData.municipality"
                 ></v-select>
               </v-col>
 
@@ -181,22 +210,38 @@
         </v-form>
       </v-card-text>
 
+      <!-- save buttons and cancel -->
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="handleSubmit" :disabled="!isValidForm">
+        <v-btn color="primary" @click="handleSubmit" :disabled="!valid || !isValidForm">
           <v-icon left>mdi-content-save</v-icon> Save
         </v-btn>
         <v-btn color="error" @click="handleCancel">
           <v-icon left>mdi-close-circle</v-icon> Cancel
         </v-btn>
       </v-card-actions>
+
+      <!-- Success dialgo for occupant Registration -->
+      <v-dialog v-model="successDialog" max-width="500" persistent>
+        <v-card class="success-dialog">
+          <v-card-title class="headline success-title">Success!</v-card-title>
+          <v-card-text class="success-text">
+            <v-icon large class="success-icon">mdi-check-circle</v-icon>
+            <p>Parking occupant registered successfully. Click the view button to register their vehicle.</p>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="success" @click="closeSuccessDialog" class="success-button">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+       </v-dialog>
     </v-card>
 
     <!-- Camera Dialog -->
-    <v-dialog v-model="cameraDialog" max-width="600px">
+    <v-dialog v-model="cameraDialog" max-width="600px" persistent>
       <v-card>
-        <v-card-title class="headline primary--text">
-          <v-icon left class="mr-2">mdi-camera</v-icon> Capture Image
+        <v-card-title class="primary darken-1 white--text" style="margin-bottom: 25px;">
+          <v-icon left class="mr-2" style="color: white">mdi-camera</v-icon> Capture Image
         </v-card-title>
         <v-card-text>
           <video ref="video" width="100%" autoplay></video>
@@ -212,6 +257,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
   </v-dialog>
 </template>
 
@@ -226,6 +272,7 @@ export default {
 
   data() {
     return {
+      successDialog: false,
       dialog: false,
       cameraDialog: false,
       valid: true,
@@ -288,6 +335,14 @@ export default {
   },
 
   methods: {
+    
+    loadRegions() {
+      this.regions = Object.keys(addressData).map(regionKey => ({
+        region_slug: regionKey.toLowerCase().replace(/ /g, '-'),
+        region_name: addressData[regionKey].region_name,
+      }));
+    },
+    
     loadProvinces() {
       const selectedRegion = this.regions.find(r => r.region_slug === this.formData.region);
       if (!selectedRegion) return;
@@ -414,8 +469,9 @@ export default {
             },
           })
           .then((response) => {
+            this.successDialog = true;
             console.log('Registration successful:', response.data);
-            alert('Registration successful');
+            // alert('Registration successful');
             this.$emit('refreshList');
             this.dialog = false;
             this.resetFormData();
@@ -604,11 +660,8 @@ export default {
       }
     },
 
-    loadRegions() {
-      this.regions = Object.keys(addressData).map(regionKey => ({
-        region_slug: regionKey.toLowerCase().replace(/ /g, '-'),
-        region_name: addressData[regionKey].region_name,
-      }));
+    closeSuccessDialog() {
+      this.successDialog = false;
     },
 
   },
@@ -616,8 +669,45 @@ export default {
 </script>
 
 <style scoped>
+.v-card {
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
 .image-preview {
   border-radius: 0;
   margin-top: 10px;
+}
+
+.success-dialog {
+  border: 1px solid #388e3c; /* Green border for success */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+.success-title {
+  color: #388e3c; /* Green title to match the theme */
+  font-weight: bold;
+}
+
+.success-text {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+}
+
+.success-icon {
+  color: #388e3c; /* Matching icon color */
+  margin-right: 16px; /* Spacing between icon and text */
+}
+
+.success-button {
+  background-color: #388e3c; /* Green background for the button */
+  color: white;
+}
+
+.success-button:hover {
+  background-color: #2c6d2f; /* Darker shade on hover */
 }
 </style>

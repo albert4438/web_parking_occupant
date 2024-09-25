@@ -1,20 +1,27 @@
 <template>
   <div>
+    <!-- Search bar of occupants -->
     <v-text-field 
-    v-model="search" 
-    label="Search Occupant" 
-    outlined
-    hide-details 
-    prepend-inner-icon="mdi-magnify"
-    class="mb-4">
-    
+      v-model="search" 
+      label="Search Occupant" 
+      outlined
+      hide-details 
+      prepend-inner-icon="mdi-magnify"
+      class="mb-4">
     </v-text-field>
     
     <!-- Button to open modal -->
-    <!-- <v-btn color="primary" class="mb-4" @click="addOccupant">ADD OCCUPANT</v-btn> -->
-    <v-btn color="primary" class="mb-4" v-if="canAddOccupant" @click="addOccupant">ADD OCCUPANT</v-btn>
+    <!-- <div style="display: flex; justify-content: flex-end;">
+    </div> -->
+    <v-btn 
+      color="primary" 
+      class="mb-4" 
+      v-if="canAddOccupant" 
+      @click="addOccupant">
+      <v-icon left>mdi-plus</v-icon>
+      ADD OCCUPANT
+    </v-btn>
 
-    
     <!-- Occupant list -->
     <v-list>
       <div v-for="occupant in filteredOccupants" :key="occupant.Occupant_ID" class="mb-2">
@@ -40,6 +47,7 @@
     
     <!-- Registration Modal -->
     <RegistrationComponent ref="registrationModal" @refreshList="fetchOccupants" />
+
   </div>
 </template>
 
@@ -118,4 +126,5 @@ export default {
 .v-btn {
   text-transform: none;
 }
+
 </style>

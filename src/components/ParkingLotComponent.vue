@@ -21,7 +21,6 @@
           <v-list-item>
             <v-list-item-content>
               <v-list-item-title>{{ lot.Parking_Lot_Name }}</v-list-item-title>
-              <v-list-item-subtitle>Total Slots: {{ lot.total_slots }}</v-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-action>
               <v-btn text color="primary" @click="editParkingLot(lot)">
@@ -34,6 +33,7 @@
       </div>
     </v-list>
 
+    <!-- success dialog for add -->
     <v-dialog v-model="successDialog" max-width="500" persistent>
       <v-card class="success-dialog">
         <v-card-title class="headline success-title">Success!</v-card-title>
@@ -49,10 +49,10 @@
     </v-dialog>
 
     <!-- Add/Edit Parking Lot Dialog -->
-    <v-dialog v-model="showAddLotDialog" max-width="500">
+    <v-dialog v-model="showAddLotDialog" max-width="500" persistent>
       <v-card>
-        <v-card-title>
-          {{ isEditing ? 'Edit Parking Lot' : 'Add Parking Lot' }}
+        <v-card-title class="primary darken-1 white--text" style="margin-bottom: 20px;">
+          <v-icon left class="mr-2" style="color: white">mdi-directions </v-icon> {{ isEditing ? 'Edit Parking Lot' : 'Add Parking Lot' }}
         </v-card-title>
         <v-card-text>
           <v-text-field
@@ -60,13 +60,7 @@
             v-model="newLot.Parking_Lot_Name"
             :rules="[v => !!v || 'Parking Lot Name is required']"
             @input="trackChanges"
-          ></v-text-field>
-          <v-text-field
-            label="Total Slots"
-            type="number"
-            v-model="newLot.total_slots"
-            :rules="[v => !!v || 'Total Slots is required']"
-            @input="trackChanges"
+            outlined
           ></v-text-field>
         </v-card-text>
         <v-card-actions>
@@ -75,9 +69,12 @@
             color="primary"
             @click="saveParkingLot"
           >
+          <v-icon left>{{ isEditing ? 'mdi-pencil' : 'mdi-content-save' }}</v-icon>
             {{ isEditing ? 'Save Changes' : 'Add' }}
           </v-btn>
-          <v-btn color="secondary" @click="clearForm">Cancel</v-btn>
+          <v-btn color="error" @click="clearForm">
+            <v-icon left>mdi-close-circle</v-icon> Cancel
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -89,7 +86,7 @@ export default {
   data() {
     return {
       parkingLots: [],
-      newLot: { Parking_Lot_Name: '', total_slots: 0 },
+      newLot: { Parking_Lot_Name: '' },
       originalLot: null,
       showAddLotDialog: false,
       isEditing: false,
@@ -106,7 +103,7 @@ export default {
       );
     },
     isFormValid() {
-      return this.newLot.Parking_Lot_Name && this.newLot.total_slots;
+      return this.newLot.Parking_Lot_Name;
     }
   },
   created() {
@@ -166,7 +163,7 @@ export default {
     },
 
     clearForm() {
-      this.newLot = { Parking_Lot_Name: '', total_slots: 0 };
+      this.newLot = { Parking_Lot_Name: '' };
       this.showAddLotDialog = false;
       this.isEditing = false;
       this.originalLot = null;
@@ -181,6 +178,13 @@ export default {
 
 
 <style scoped>
+
+.v-card {
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
     .parking-lot-container {
     padding: 20px;
     }

@@ -1,18 +1,26 @@
 <template>
   <v-navigation-drawer permanent app color="#104a8e" dark>
-    <!-- User Information Section -->
-    <v-list-item class="user-info">
-      <v-list-item-avatar>
-        <!-- Display profile picture or default icon -->
-        <v-img :src="getProfilePicture(profilePicture)" v-if="profilePicture" aspect-ratio="1" class="profile-picture" />
-        <v-icon v-else x-large>mdi-account</v-icon>
-      </v-list-item-avatar>
+    
+    <!-- Compact System Header -->
+    <v-card class="centered-system-header elevation-2">
+      <v-row no-gutters justify="center" align="center" class="system-header-row">
+        
+        <!-- Profile Picture Section -->
+        <v-col cols="12" class="text-center">
+          <v-avatar size="80" class="profile-avatar">
+            <v-img :src="getProfilePicture(profilePicture)" v-if="profilePicture" class="profile-picture" />
+            <v-icon v-else large color="white">mdi-account</v-icon>
+          </v-avatar>
+        </v-col>
 
-      <v-list-item-content>
-        <v-list-item-title class="text-capitalize">{{ firstname }}</v-list-item-title>
-        <v-list-item-subtitle class="subtitle">{{ jobTitle }}</v-list-item-subtitle>
-      </v-list-item-content>
-    </v-list-item>
+        <!-- Name and Job Title Section -->
+        <v-col cols="12" class="text-center">
+          <v-list-item-title class="user-name">{{ firstname }}</v-list-item-title>
+          <v-list-item-subtitle class="user-job-title">{{ jobTitle }}</v-list-item-subtitle>
+        </v-col>
+
+      </v-row>
+    </v-card>
 
     <!-- Main Navigation Items -->
     <v-list>
@@ -30,7 +38,7 @@
             <v-list-item-title>{{ item.text }}</v-list-item-title>
           </v-list-item-content>
           <v-list-item-icon v-if="item.text === 'SETTINGS'">
-            <v-icon>{{ isSettingsSelected && showSubItems ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+            <v-icon>{{ isSettingsSelected && showSubItems ? 'mdi-chevron-up-circle' : 'mdi-chevron-down-circle' }}</v-icon>
           </v-list-item-icon>
         </v-list-item>
 
@@ -59,6 +67,7 @@
     <div class="logout-btn">
       <v-btn color="#ffbd2e" dark block tile @click="logout">LOGOUT</v-btn>
     </div>
+    
   </v-navigation-drawer>
 </template>
 
@@ -76,7 +85,7 @@ export default {
         { icon: 'mdi-cogs', text: 'SETTINGS', route: '/dashboard/settings' },
       ],
       settingsSubItems: [
-        { icon: 'mdi-account-group', text: 'ROLES', route: '/dashboard/role-register' },
+        { icon: 'mdi-account-key', text: 'ROLES', route: '/dashboard/role-register' },
         { icon: 'mdi-qrcode', text: 'QR LOGO', route: '/dashboard/qr-logo' },
         { icon: 'mdi-directions', text: 'PARKING LOT', route: '/dashboard/parking-lot' }, // New Parking Lot submenu item
       ],
@@ -176,6 +185,47 @@ export default {
 </script>
 
 <style scoped>
+/* Centered system header */
+.centered-system-header {
+  margin-top: 8px;
+  background-color: #104a8e;
+  padding: 5px 0;
+  border-radius: 0;
+  margin-bottom: 20px;
+}
+
+.system-header-row {
+  margin: 0; /* Remove margin for cleaner look */
+}
+
+/* Profile Picture Styling */
+.profile-avatar {
+  background-color: white;
+  border: 3px solid #ffbd2e; /* Border for emphasis */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+.profile-picture {
+  object-fit: cover;
+  border-radius: 50%; /* Circular profile picture */
+}
+
+/* User Name and Job Title */
+.user-name {
+  font-weight: 700;
+  font-size: 16px;
+  margin: 8px 0 2px;
+  color: #ffbd2e; /* Highlight color for name */
+  letter-spacing: 1px;
+}
+
+.user-job-title {
+  font-size: 12px;
+  margin: 0;
+  color: lightgray; /* Subtle color for job title */
+}
+
+/* User info section */
 .user-info {
   padding: 10px 16px;
 }
@@ -191,22 +241,40 @@ export default {
   padding: 10px;
 }
 
+/* Drawer background */
+.v-navigation-drawer {
+  background-color: #104a8e;
+}
+
+/* Hover state for active items */
 .active-item .v-list-item-title,
 .active-item .v-icon {
   color: #ffbd2e !important;
-}
-
-.v-navigation-drawer {
-  background-color: #104a8e;
 }
 
 .v-list-item {
   cursor: pointer;
 }
 
-/* Add this style for the profile picture */
-.profile-picture {
-  border-radius: 50%;
-  object-fit: cover;
+/* Shield icon styling */
+.centered-system-icon {
+  color: #ffbd2e; /* Gold color for shield icon */
+}
+
+/* Smaller system title (if needed elsewhere) */
+.small-system-title {
+  font-weight: 700;
+  font-size: 16px;
+  margin: 8px 0 2px;
+  color: #ffbd2e;
+  letter-spacing: 1px;
+}
+
+/* Smaller system subtitle */
+.small-system-subtitle {
+  font-size: 12px;
+  margin: 0;
+  color: lightgray;
 }
 </style>
+

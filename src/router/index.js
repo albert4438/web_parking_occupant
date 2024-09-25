@@ -5,10 +5,10 @@ import DashboardComponent from '../components/DashboardComponent.vue';
 import OccupantComponent from '../components/OccupantComponent.vue';
 import RegistrationComponent from '../components/RegistrationComponent.vue';
 import ParkingLogComponent from '../components/ParkingLogComponent.vue';
-import SettingsComponent from '../components/SettingsComponent.vue';
+//import SettingsComponent from '../components/SettingsComponent.vue';
 import RoleRegisterComponent from '@/components/RoleRegisterComponent.vue';
 import QRLogo from '@/components/QRLogo.vue';
-import ParkingLotComponent from '@/components/ParkingLotComponent.vue'; // Import the new Parking Lot component
+import ParkingLotComponent from '@/components/ParkingLotComponent.vue';
 import ViewActionOccupantComponent from '@/components/ViewActionOccupantComponent.vue';
 
 Vue.use(VueRouter);
@@ -52,12 +52,12 @@ const routes = [
         component: ParkingLogComponent,
         meta: { requiresAuth: true },
       },
-      {
-        path: 'settings',
-        name: 'settings',
-        component: SettingsComponent,
-        meta: { requiresAuth: true },
-      },
+      // {
+      //   path: 'settings',
+      //   name: 'settings',
+      //   component: SettingsComponent,
+      //   meta: { requiresAuth: true },
+      // },
       {
         path: 'role-register',
         name: 'role-register',
