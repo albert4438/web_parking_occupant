@@ -276,54 +276,54 @@
     
     <!-- edit vehicle dialog -->
     <v-dialog v-model="editVehicleDialog" max-width="500px" persistent>
-  <v-card>
-    <v-card-title class="primary darken-1 white--text" style="margin-bottom: 10px;">
-      <v-icon left class="mr-2" style="color: white">mdi-car</v-icon> Edit Vehicle  
-      <v-icon size="24" style="color: white; margin-left: 7px;">mdi-scooter</v-icon>
-    </v-card-title>
+      <v-card>
+        <v-card-title class="primary darken-1 white--text" style="margin-bottom: 10px;">
+          <v-icon left class="mr-2" style="color: white">mdi-car</v-icon> Edit Vehicle  
+          <v-icon size="24" style="color: white; margin-left: 7px;">mdi-scooter</v-icon>
+        </v-card-title>
 
-      <div style="margin-bottom: 15px;">
-        <v-col cols="12" sm="15" v-if="editedVehicle">
-            <v-card class="pa-3 elevation-1">
-              <div class="d-flex align-center">
-                <!-- <span>(Vehicle Type: {{ editedVehicle.Vehicle_type }}, 
-                      Plate Number: {{ editedVehicle.Vehicle_platenumber }}, 
-                      Vehicle Model: {{ editedVehicle.Vehicle_model }}, 
-                      Vehicle Brand: {{ editedVehicle.Vehicle_brand }})</span> -->
-                  <ul>
-                  <li>Vehicle Type: {{ editedVehicle.Vehicle_type }}</li>
-                  <li>Plate Number: {{ editedVehicle.Vehicle_platenumber }}</li>
-                  <li>Vehicle Model: {{ editedVehicle.Vehicle_model }}</li>
-                  <li>Vehicle Brand: {{ editedVehicle.Vehicle_brand }}</li>
-                </ul>
-              </div>
-            </v-card>
-          </v-col>
-      </div>
+          <div style="margin-bottom: 15px;">
+            <v-col cols="12" sm="15" v-if="editedVehicle">
+                <v-card class="pa-3 elevation-1">
+                  <div class="d-flex align-center">
+                    <!-- <span>(Vehicle Type: {{ editedVehicle.Vehicle_type }}, 
+                          Plate Number: {{ editedVehicle.Vehicle_platenumber }}, 
+                          Vehicle Model: {{ editedVehicle.Vehicle_model }}, 
+                          Vehicle Brand: {{ editedVehicle.Vehicle_brand }})</span> -->
+                      <ul>
+                      <li>Vehicle Type: {{ editedVehicle.Vehicle_type }}</li>
+                      <li>Plate Number: {{ editedVehicle.Vehicle_platenumber }}</li>
+                      <li>Vehicle Model: {{ editedVehicle.Vehicle_model }}</li>
+                      <li>Vehicle Brand: {{ editedVehicle.Vehicle_brand }}</li>
+                    </ul>
+                  </div>
+                </v-card>
+              </v-col>
+          </div>
 
-    <v-card-text style="margin-bottom: -37px;">
-      <v-form>
-        <v-select
-          v-model="editedVehicleColor"
-          :items="colorOptions"
-          label="Vehicle Color"
-          required
-          outlined
-        />
-      </v-form>
-    </v-card-text>
+        <v-card-text style="margin-bottom: -37px;">
+          <v-form>
+            <v-select
+              v-model="editedVehicleColor"
+              :items="colorOptions"
+              label="Vehicle Color"
+              required
+              outlined
+            />
+          </v-form>
+        </v-card-text>
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn color="primary" :disabled="!isVehicleColorChanged" @click="saveVehicleColor">
-        <v-icon left>mdi-content-save</v-icon> Save
-      </v-btn>
-      <v-btn color="error" @click="editVehicleDialog = false">
-        <v-icon left>mdi-close-circle</v-icon> Cancel
-      </v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" :disabled="!isVehicleColorChanged" @click="saveVehicleColor">
+            <v-icon left>mdi-content-save</v-icon> Save
+          </v-btn>
+          <v-btn color="error" @click="editVehicleDialog = false">
+            <v-icon left>mdi-close-circle</v-icon> Cancel
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- Edit profile dialog -->
     <v-dialog v-model="editModal" max-width="850px" @address-updated="isFormChanged = true" persistent>

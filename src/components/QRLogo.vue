@@ -40,7 +40,7 @@
           @click="addOrEdit"
           color="primary"
         >
-        <v-icon left>mdi-content-save</v-icon> {{ buttonText }}
+        <v-icon left>mdi-content-save-outline</v-icon> {{ buttonText }}
         </v-btn>
 
         <!-- cancel button only -->
@@ -50,12 +50,12 @@
           color="error"
           class="ml-2"
         >
-        <v-icon left>mdi-close-circle</v-icon> Cancel
+        <v-icon left>mdi-close-circle-outline</v-icon> Cancel
         </v-btn>
 
         <!-- Confirmation Dialog Button -->
         <v-btn @click="triggerConfirmationDialog" :disabled="confirmDisabled" color="secondary" class="ml-4">
-          <v-icon left>mdi-check</v-icon> {{ confirmButtonText }}
+          <v-icon left>mdi-alert</v-icon> {{ confirmButtonText }}
         </v-btn>
 
       </v-card-text>
@@ -71,14 +71,20 @@
             <v-alert v-else-if="!institutionNameExists" type="info">No institution name currently stored</v-alert>
             <v-alert v-else-if="!logoUrl" type="info">No logo currently stored</v-alert>
             <v-row v-else>
-              <v-col cols="6">
-                <v-alert type="info">Institution Name: {{ institutionName }}</v-alert>
-              </v-col>
-              <v-col cols="6">
-                <img :src="logoUrl" alt="QR Logo" class="logo-preview">
-              </v-col>
+                <v-col cols="12" sm="5">
+                  <v-card class="pa-5 elevation-1">
+                    <div class="d-flex align-center">
+                      <v-icon class="mr-5" small>mdi-school-outline</v-icon>
+                      <span>{{ institutionName }}</span>
+                    </div>
+                  </v-card>
+                </v-col>
+                <v-col cols="6">
+                  <img :src="logoUrl" alt="QR Logo" class="logo-preview">
+                </v-col>
             </v-row>
           </v-col>
+
         </v-row>
       </v-card-text>
     </v-card>

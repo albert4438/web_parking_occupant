@@ -2,159 +2,159 @@
   <div>
     <!-- Filter and Search Panel -->
     <v-card class="mb-4 pa-4">
-  <v-row dense>
-    <!-- Row 1: Keyword Search, Action Type, Date Range, Sort By -->
-    <v-col cols="12" md="3">
-      <v-text-field 
-        v-model="search" 
-        label="Search by keyword" 
-        outlined
-        clearable
-        prepend-inner-icon="mdi-magnify"
-        @keyup.enter="applyFilters"
-      ></v-text-field>
-    </v-col>
-
-    <v-col cols="12" md="3">
-      <v-select
-        v-model="actionType"
-        :items="['All', 'ENTRY', 'EXIT']"
-        label="Filter by action"
-        outlined
-        clearable
-        prepend-inner-icon="mdi-filter"
-        @change="applyFilters"
-      ></v-select>
-    </v-col>
-
-
-    <v-col cols="12" md="3">
-      <v-menu
-        v-model="menu"
-        :close-on-content-click="false"
-        :nudge-right="40"
-        transition="scale-transition"
-        offset-y
-        min-width="290px"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-text-field
-            v-model="dateRangeText"
-            label="Filter by date range"
-            readonly
-            v-bind="attrs"
-            v-on="on"
+      <v-row dense>
+        <!-- Row 1: Keyword Search, Action Type, Date Range, Sort By -->
+        <v-col cols="12" md="3">
+          <v-text-field 
+            v-model="search" 
+            label="Search by keyword" 
             outlined
             clearable
-            prepend-inner-icon="mdi-calendar-range"
+            prepend-inner-icon="mdi-magnify"
+            @keyup.enter="applyFilters"
           ></v-text-field>
-        </template>
-        <v-date-picker
-          v-model="dateRange"
-          range
-          scrollable
-          @change="applyFilters"
-        ></v-date-picker>
-      </v-menu>
-    </v-col>
+        </v-col>
 
-    <v-col cols="12" md="3">
-      <v-select
-        v-model="sortOption"
-        :items="['Date: Latest First', 'Date: Oldest First']"
-        label="Sort by"
-        outlined
-        clearable
-        prepend-inner-icon="mdi-sort"
-        @change="applyFilters"
-      ></v-select>
-    </v-col>
-  </v-row>
+        <v-col cols="12" md="3">
+          <v-select
+            v-model="actionType"
+            :items="['All', 'ENTRY', 'EXIT']"
+            label="Filter by action"
+            outlined
+            clearable
+            prepend-inner-icon="mdi-filter"
+            @change="applyFilters"
+          ></v-select>
+        </v-col>
+
+
+        <v-col cols="12" md="3">
+          <v-menu
+            v-model="menu"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            offset-y
+            min-width="290px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="dateRangeText"
+                label="Filter by date range"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+                outlined
+                clearable
+                prepend-inner-icon="mdi-calendar-range"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="dateRange"
+              range
+              scrollable
+              @change="applyFilters"
+            ></v-date-picker>
+          </v-menu>
+        </v-col>
+
+        <v-col cols="12" md="3">
+          <v-select
+            v-model="sortOption"
+            :items="['Date: Latest First', 'Date: Oldest First']"
+            label="Sort by"
+            outlined
+            clearable
+            prepend-inner-icon="mdi-sort"
+            @change="applyFilters"
+          ></v-select>
+        </v-col>
+      </v-row>
 
       <v-row dense>
-        <!-- Row 2: Vehicle Type, Vehicle Brand, Vehicle Model, Parking Lot -->
-        <v-col cols="12" md="3">
-          <v-select
-            v-model="vehicleType"
-            :items="vehicleTypes"
-            label="Filter by vehicle type"
-            outlined
-            clearable
-            prepend-inner-icon="mdi-car"
-            @change="onVehicleTypeChange"
-          ></v-select>
-        </v-col>
+            <!-- Row 2: Vehicle Type, Vehicle Brand, Vehicle Model, Parking Lot -->
+            <v-col cols="12" md="3">
+              <v-select
+                v-model="vehicleType"
+                :items="vehicleTypes"
+                label="Filter by vehicle type"
+                outlined
+                clearable
+                prepend-inner-icon="mdi-car"
+                @change="onVehicleTypeChange"
+              ></v-select>
+            </v-col>
 
-        <v-col cols="12" md="3">
-          <v-select
-            v-model="vehicleBrand"
-            :items="vehicleBrands"
-            label="Filter by vehicle brand"
-            outlined
-            clearable
-            prepend-inner-icon="mdi-car"
-            @change="onVehicleBrandChange"
-            :disabled="!vehicleType"
-          ></v-select>
-        </v-col>
+            <v-col cols="12" md="3">
+              <v-select
+                v-model="vehicleBrand"
+                :items="vehicleBrands"
+                label="Filter by vehicle brand"
+                outlined
+                clearable
+                prepend-inner-icon="mdi-car"
+                @change="onVehicleBrandChange"
+                :disabled="!vehicleType"
+              ></v-select>
+            </v-col>
 
-        <v-col cols="12" md="3">
-          <v-select
-            v-model="vehicleModel"
-            :items="vehicleModels"
-            label="Filter by vehicle model"
-            outlined
-            clearable
-            prepend-inner-icon="mdi-car"
-            @change="applyFilters"
-            :disabled="!vehicleBrand"
-          ></v-select>
-        </v-col>
+            <v-col cols="12" md="3">
+              <v-select
+                v-model="vehicleModel"
+                :items="vehicleModels"
+                label="Filter by vehicle model"
+                outlined
+                clearable
+                prepend-inner-icon="mdi-car"
+                @change="applyFilters"
+                :disabled="!vehicleBrand"
+              ></v-select>
+            </v-col>
 
-        <v-col cols="12" md="3">
-          <v-select
-            v-model="parkingLotName"
-            :items="parkingLotNames"
-            label="Filter by parking lot"
-            outlined
-            clearable
-            prepend-inner-icon="mdi-parking"
-            @change="applyFilters"
-          ></v-select>
-        </v-col>
+            <v-col cols="12" md="3">
+              <v-select
+                v-model="parkingLotName"
+                :items="parkingLotNames"
+                label="Filter by parking lot"
+                outlined
+                clearable
+                prepend-inner-icon="mdi-parking"
+                @change="applyFilters"
+              ></v-select>
+            </v-col>
       </v-row>
 
       <!-- Row 3: Buttons aligned to the right -->
       <v-row dense >
-            <!-- Total Logs Section -->
-            <v-col cols="12" md="2" class="mt-1 ml-2">
-              <v-card class="py-2 px-3" elevation="1" outlined>
-                <v-row dense align="center">
-                  <v-icon color="primary" size="28" class="mr-2">mdi-file-document-box-multiple</v-icon>
-                  <div>
-                    <span class="caption text-muted">Total Logs: </span>
-                    <span class="subtitle-2 text-primary font-weight-bold">{{ totalLogs }}</span>
-                  </div>
-                </v-row>
-              </v-card>
-            </v-col>
-        <v-row dense justify="end">
-            <v-btn color="success" class="mt-3 ml-2" @click="printFilteredLogs(true)" elevation="1" rounded outlined>
-              <v-icon left>mdi-printer</v-icon>
-              Print All Logs
-            </v-btn>
-            <v-btn color="success" class="mt-3 ml-2" @click="printFilteredLogs(false)" elevation="1" rounded outlined>
-              <v-icon left>mdi-printer</v-icon>
-              Print Current Page
-            </v-btn>
-            <v-btn color="primary" class="mt-3 ml-2" @click="resetFilters" elevation="2" rounded >
-              <v-icon left>mdi-autorenew</v-icon>
-              Reset Filters
-            </v-btn>
-        </v-row>
+                <!-- Total Logs Section -->
+                <v-col cols="12" md="2" class="mt-1 ml-2">
+                  <v-card class="py-2 px-3" elevation="1" outlined>
+                    <v-row dense align="center">
+                      <v-icon color="primary" size="28" class="mr-2">mdi-file-document-box-multiple</v-icon>
+                      <div>
+                        <span class="caption text-muted">Total Logs: </span>
+                        <span class="subtitle-2 text-primary font-weight-bold">{{ totalLogs }}</span>
+                      </div>
+                    </v-row>
+                  </v-card>
+                </v-col>
+            <v-row dense justify="end">
+                <v-btn color="success" class="mt-3 ml-2" @click="printFilteredLogs(true)" elevation="1" rounded outlined>
+                  <v-icon left>mdi-printer</v-icon>
+                  Print All Logs
+                </v-btn>
+                <v-btn color="success" class="mt-3 ml-2" @click="printFilteredLogs(false)" elevation="1" rounded outlined>
+                  <v-icon left>mdi-printer</v-icon>
+                  Print Current Page
+                </v-btn>
+                <v-btn color="primary" class="mt-3 ml-2" @click="resetFilters" elevation="2" rounded >
+                  <v-icon left>mdi-autorenew</v-icon>
+                  Reset Filters
+                </v-btn>
+            </v-row>
       </v-row>
 
-</v-card>
+    </v-card>
 
 
     <!-- Filter Chips -->
@@ -427,118 +427,232 @@ export default {
       this.applyFilters();  
     },
 
+    
+  //   async printFilteredLogs(printAll = false) {
+  //     try {
+  //         // Fetch the logo and institution name
+  //         await this.fetchExistingLogo();
+  //         await this.fetchInstitutionName();
 
-    async printFilteredLogs(printAll = false) {
+  //         //window size on printing
+  //         const printWindow = window.open('', '', 'height=500,width=800');
+
+  //         // Ensure the logo is fetched correctly and define an onload callback to print only after the logo loads
+  //         const logoHtml = this.logoExists 
+  //             ? `<img id="logoImage" src="${this.logoUrl}" alt="Institution Logo" style="width: 50px; height: auto; margin-right: 20px;" />` 
+  //             : '';
+  //         const institutionNameHtml = this.institutionNameExists 
+  //             ? `<h2 style="font-size: 24px; color: #333; margin: 0;">${this.institutionName}</h2>` 
+  //             : '';
+
+  //         // Construct the header with logo and institution name
+  //         const headerHtml = `
+  //             <div style="display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px;">
+  //                 ${logoHtml}
+  //                 ${institutionNameHtml}
+  //             </div>
+  //         `;
+
+  //         // Use already fetched logs
+  //         const logsToPrint = printAll ? this.parkingLogs : this.filteredLogs.slice(0, this.perPage);
+
+  //         if (logsToPrint.length === 0) {
+  //             this.errorDialog = true; // Trigger the error dialog
+  //             console.error('No logs available to print');
+  //             return;
+  //         }
+
+  //         // Get selected columns to print
+  //         const columnsToPrint = this.selectedColumns.length > 0 
+  //             ? this.selectedColumns 
+  //             : this.columns.map(col => col.value); // If no columns are selected, print all
+
+  //         // Map the logs into printable data
+  //         const logsData = logsToPrint.map(log => {
+  //             return columnsToPrint.map(column => {
+  //                 if (column === 'timestamp') {
+  //                     // Format the timestamp to show date and time in 12-hour format with AM/PM
+  //                     return new Date(log.timestamp).toLocaleString('en-US', { 
+  //                         year: 'numeric',
+  //                         month: 'numeric',
+  //                         day: 'numeric',
+  //                         hour: 'numeric', 
+  //                         minute: 'numeric', 
+  //                         second: 'numeric', 
+  //                         hour12: true 
+  //                     });
+  //                 }
+  //                 return log[column] || 'N/A';
+  //             });
+  //         });
+
+  //         // Get headers for the selected columns
+  //         const headers = columnsToPrint.map(column => {
+  //             const col = this.columns.find(col => col.value === column);
+  //             return col ? col.label : '';
+  //         });
+
+  //         // Prepare the document content
+  //         printWindow.document.write('<html><head><title>Parking Logs</title>');
+  //         printWindow.document.write('<style>table { border-collapse: collapse; width: 100%; } th, td { border: 1px solid #ddd; padding: 8px; }</style>');
+  //         printWindow.document.write('</head><body>');
+
+  //         // Insert the header with logo and institution name
+  //         printWindow.document.write(headerHtml);
+
+  //         printWindow.document.write('<table><thead><tr>');
+
+  //         // Add headers
+  //         headers.forEach(header => {
+  //             printWindow.document.write(`<th>${header}</th>`);
+  //         });
+  //         printWindow.document.write('</tr></thead><tbody>');
+
+  //         // Add log rows
+  //         logsData.forEach(row => {
+  //             printWindow.document.write('<tr>');
+  //             row.forEach(cell => {
+  //                 printWindow.document.write(`<td>${cell}</td>`);
+  //             });
+  //             printWindow.document.write('</tr>');
+  //         });
+
+  //         printWindow.document.write('</tbody></table></body></html>');
+  //         printWindow.document.close();
+
+  //         // Add event listener for the logo loading
+  //         const logoImage = printWindow.document.getElementById('logoImage');
+
+  //         if (logoImage) {
+  //             // Ensure print happens only after the logo image is fully loaded
+  //             logoImage.onload = () => {
+  //                 printWindow.focus();
+  //                 printWindow.print();
+  //             };
+  //         } else {
+  //             // If no logo exists, proceed to print
+  //             printWindow.focus();
+  //             printWindow.print();
+  //         }
+  //     } catch (error) {
+  //         console.error('Error in printing logs:', error);
+  //         this.errorDialog = true; // Trigger the error dialog
+  //     }
+  // },
+
+  async printFilteredLogs(printAll = false) {
     try {
-        // Fetch the logo and institution name
-        await this.fetchExistingLogo();
-        await this.fetchInstitutionName();
+      // Fetch the logo and institution name
+      await this.fetchExistingLogo();
+      await this.fetchInstitutionName();
 
-        //window size on printing
-        const printWindow = window.open('', '', 'height=500,width=800');
+      // Ensure the logo and institution name is fetched correctly and define an onload callback to print only after the logo loads
+      const logoHtml = this.logoExists 
+          ? `<img id="logoImage" src="${this.logoUrl}" alt="Institution Logo" style="width: 50px; height: auto; margin-right: 20px;" />` 
+          : '';
+      const institutionNameHtml = this.institutionNameExists 
+          ? `<h2 style="font-size: 24px; color: #333; margin: 0;">${this.institutionName}</h2>` 
+          : '';
 
-        // Ensure the logo is fetched correctly and define an onload callback to print only after the logo loads
-        const logoHtml = this.logoExists 
-            ? `<img id="logoImage" src="${this.logoUrl}" alt="Institution Logo" style="width: 50px; height: auto; margin-right: 20px;" />` 
-            : '';
-        const institutionNameHtml = this.institutionNameExists 
-            ? `<h2 style="font-size: 24px; color: #333; margin: 0;">${this.institutionName}</h2>` 
-            : '';
+      // Construct the header with logo and institution name
+      const headerHtml = `
+          <div style="display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px;">
+              ${logoHtml}
+              ${institutionNameHtml}
+          </div>
+      `;
 
-        // Construct the header with logo and institution name
-        const headerHtml = `
-            <div style="display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px;">
-                ${logoHtml}
-                ${institutionNameHtml}
-            </div>
-        `;
+      // Use already fetched logs
+      const logsToPrint = printAll ? this.parkingLogs : this.filteredLogs.slice(0, this.perPage);
 
-        // Use already fetched logs
-        const logsToPrint = printAll ? this.parkingLogs : this.filteredLogs.slice(0, this.perPage);
+      if (logsToPrint.length === 0) {
+          this.errorDialog = true; // Trigger the error dialog
+          console.error('No logs available to print');
+          return;
+      }
 
-        if (logsToPrint.length === 0) {
-            this.errorDialog = true; // Trigger the error dialog
-            console.error('No logs available to print');
-            return;
-        }
+      // Get selected columns to print
+      const columnsToPrint = this.selectedColumns.length > 0 
+          ? this.selectedColumns 
+          : this.columns.map(col => col.value); // If no columns are selected, print all
 
-        // Get selected columns to print
-        const columnsToPrint = this.selectedColumns.length > 0 
-            ? this.selectedColumns 
-            : this.columns.map(col => col.value); // If no columns are selected, print all
+      // Map the logs into printable data
+      const logsData = logsToPrint.map(log => {
+          return columnsToPrint.map(column => {
+              if (column === 'timestamp') {
+                  // Format the timestamp to show date and time in 12-hour format with AM/PM
+                  return new Date(log.timestamp).toLocaleString('en-US', { 
+                      year: 'numeric',
+                      month: 'numeric',
+                      day: 'numeric',
+                      hour: 'numeric', 
+                      minute: 'numeric', 
+                      second: 'numeric', 
+                      hour12: true 
+                  });
+              }
+              return log[column] || 'N/A';
+          });
+      });
 
-        // Map the logs into printable data
-        const logsData = logsToPrint.map(log => {
-            return columnsToPrint.map(column => {
-                if (column === 'timestamp') {
-                    // Format the timestamp to show date and time in 12-hour format with AM/PM
-                    return new Date(log.timestamp).toLocaleString('en-US', { 
-                        year: 'numeric',
-                        month: 'numeric',
-                        day: 'numeric',
-                        hour: 'numeric', 
-                        minute: 'numeric', 
-                        second: 'numeric', 
-                        hour12: true 
-                    });
-                }
-                return log[column] || 'N/A';
-            });
-        });
+      // Get headers for the selected columns
+      const headers = columnsToPrint.map(column => {
+          const col = this.columns.find(col => col.value === column);
+          return col ? col.label : '';
+      });
 
-        // Get headers for the selected columns
-        const headers = columnsToPrint.map(column => {
-            const col = this.columns.find(col => col.value === column);
-            return col ? col.label : '';
-        });
+      // Add a conditional check before opening the print window
+      if (!this.errorDialog) {
+          const printWindow = window.open('', '', 'height=500,width=800');
 
-        // Prepare the document content
-        printWindow.document.write('<html><head><title>Parking Logs</title>');
-        printWindow.document.write('<style>table { border-collapse: collapse; width: 100%; } th, td { border: 1px solid #ddd; padding: 8px; }</style>');
-        printWindow.document.write('</head><body>');
+          // Prepare the document content
+          printWindow.document.write('<html><head><title>Parking Logs</title>');
+          printWindow.document.write('<style>table { border-collapse: collapse; width: 100%; } th, td { border: 1px solid #ddd; padding: 8px; }</style>');
+          printWindow.document.write('</head><body>');
 
-        // Insert the header with logo and institution name
-        printWindow.document.write(headerHtml);
+          // Insert the header with logo and institution name
+          printWindow.document.write(headerHtml);
 
-        printWindow.document.write('<table><thead><tr>');
+          printWindow.document.write('<table><thead><tr>');
 
-        // Add headers
-        headers.forEach(header => {
-            printWindow.document.write(`<th>${header}</th>`);
-        });
-        printWindow.document.write('</tr></thead><tbody>');
+          // Add headers
+          headers.forEach(header => {
+              printWindow.document.write(`<th>${header}</th>`);
+          });
+          printWindow.document.write('</tr></thead><tbody>');
 
-        // Add log rows
-        logsData.forEach(row => {
-            printWindow.document.write('<tr>');
-            row.forEach(cell => {
-                printWindow.document.write(`<td>${cell}</td>`);
-            });
-            printWindow.document.write('</tr>');
-        });
+          // Add log rows
+          logsData.forEach(row => {
+              printWindow.document.write('<tr>');
+              row.forEach(cell => {
+                  printWindow.document.write(`<td>${cell}</td>`);
+              });
+              printWindow.document.write('</tr>');
+          });
 
-        printWindow.document.write('</tbody></table></body></html>');
-        printWindow.document.close();
+          printWindow.document.write('</tbody></table></body></html>');
+          printWindow.document.close();
 
-        // Add event listener for the logo loading
-        const logoImage = printWindow.document.getElementById('logoImage');
+          // Add event listener for the logo loading
+          const logoImage = printWindow.document.getElementById('logoImage');
 
-        if (logoImage) {
-            // Ensure print happens only after the logo image is fully loaded
-            logoImage.onload = () => {
-                printWindow.focus();
-                printWindow.print();
-            };
-        } else {
-            // If no logo exists, proceed to print
-            printWindow.focus();
-            printWindow.print();
-        }
+          if (logoImage) {
+              // Ensure print happens only after the logo image is fully loaded
+              logoImage.onload = () => {
+                  printWindow.focus();
+                  printWindow.print();
+              };
+          } else {
+              // If no logo exists, proceed to print
+              printWindow.focus();
+              printWindow.print();
+          }
+      }
     } catch (error) {
-        console.error('Error in printing logs:', error);
-        this.errorDialog = true; // Trigger the error dialog
+      console.error('Error in printing logs:', error);
+      this.errorDialog = true; // Trigger the error dialog
     }
-},
+  },
 
     changePage(page) {
       this.page = page;

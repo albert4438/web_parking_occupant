@@ -1,0 +1,25 @@
+des : Albert
+
+
+Alb : ert
+
+Naga ramble ni sya gamit ang crpyto js + random function sa js:
+const iv = CryptoJS.lib.WordArray.random(16);
+
+Naga ramble pud ni pero may key nani:
+    const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), encryptionKey, {
+      iv: iv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7
+    });
+
+
+
+const ivBase64 = Alb  --------  using the function -> CryptoJS.enc.Base64.stringify(iv);
+const encryptedBase64 = ert --------- using the function -> encrypted.toString();
+
+
+
+result= ivBase64 :  encryptedBase64
+or 
+return ${ivBase64}:${encryptedBase64};
